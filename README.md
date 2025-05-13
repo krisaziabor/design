@@ -1,36 +1,43 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+<img src="http://getkirby.com/assets/images/github/starterkit.jpg" width="300">
 
-## Getting Started
+**Kirby: the CMS that adapts to any project, loved by developers and editors alike.**
+The Starterkit is a full-blown Kirby installation with a lot of example content, blueprints, templates and more.
+It is ideal for new users to explore many of Kirby's options and get to know the Panel.
 
-First, run the development server:
+You can learn more about Kirby at [getkirby.com](https://getkirby.com).
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+<img src="http://getkirby.com/assets/images/github/starterkit-screen.png" />
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Try Kirby for free
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+You can try Kirby and the Starterkit on your local machine or on a test server as long as you need to make sure it is the right tool for your next project. … and when you’re convinced, [buy your license](https://getkirby.com/buy).
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+The Starterkit is a demo of basic Kirby features. It's not recommended to be used "as is" in production. Please, follow our documentation closely for more features and guides on how to build secure, high-quality websites with Kirby.
 
-## Learn More
+While Kirby as the CMS software itself requires you to purchase a license, we consider the files primarily connected to this Starterkit (assets, templates, snippets...) free to use under the MIT license. Feel free to start building your own project with them.
 
-To learn more about Next.js, take a look at the following resources:
+### Get going
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Read our guide on [how to get started with Kirby](https://getkirby.com/docs/guide/quickstart).
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+You can download the latest version of the Starterkit from https://download.getkirby.com/.
+If you are familiar with Git, you can clone Kirby's Starterkit repository from Github.
 
-## Deploy on Vercel
+    git clone https://github.com/getkirby/starterkit.git
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## What's Kirby?
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+-   **[getkirby.com](https://getkirby.com)** – Get to know the CMS.
+-   **[Try it](https://getkirby.com/try)** – Take a test ride with our online demo. Or download one of our kits to get started.
+-   **[Documentation](https://getkirby.com/docs/guide)** – Read the official guide, reference and cookbook recipes.
+-   **[Issues](https://github.com/getkirby/kirby/issues)** – Report bugs and other problems.
+-   **[Feedback](https://feedback.getkirby.com)** – You have an idea for Kirby? Share it.
+-   **[Forum](https://forum.getkirby.com)** – Whenever you get stuck, don't hesitate to reach out for questions and support.
+-   **[Discord](https://chat.getkirby.com)** – Hang out and meet the community.
+-   **[YouTube](https://youtube.com/kirbyCasts)** - Watch the latest video tutorials visually with Bastian.
+-   **[Mastodon](https://mastodon.social/@getkirby)** – Spread the word.
+-   **[Bluesky](https://bsky.app/profile/getkirby.com)** – Tell a friend.
+---
+
+© 2009 Bastian Allgeier
+[getkirby.com](https://getkirby.com) · [License agreement](https://getkirby.com/license)
