@@ -1,17 +1,16 @@
 {
   "compilerOptions": {
-    "target": "ES2017",
-    "lib": ["dom", "dom.iterable", "esnext"],
-    "allowJs": true,
-    "skipLibCheck": true,
+    "target": "ES2020",
+    "module": "commonjs",
+    "lib": ["ES2020"],
     "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "module": "Preserve",
-    "moduleDetection": "force",
-    "isolatedModules": true,
-    "jsx": "preserve",
-    "incremental": true
+    "outDir": "dist",
+    "rootDir": ".",
+    "moduleResolution": "node"
   },
-  "include": ["**/*.ts", "**/*.tsx"],
+  "include": ["scripts/**/*"],
   "exclude": ["node_modules"]
 }
