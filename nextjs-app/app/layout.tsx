@@ -1,8 +1,9 @@
 import "./globals.css";
+import localFont from "next/font/local";
+// import { Analytics } from "@vercel/analytics/react";
 
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
 import { draftMode } from "next/headers";
 import { VisualEditing, toPlainText } from "next-sanity";
 import { Toaster } from "sonner";
@@ -15,6 +16,19 @@ import { sanityFetch, SanityLive } from "@/sanity/lib/live";
 import { settingsQuery } from "@/sanity/lib/queries";
 import { resolveOpenGraphImage } from "@/sanity/lib/utils";
 import { handleError } from "./client-utils";
+
+const albragrotesk = localFont({
+  src: "./fonts/AlbraGrotesk-Regular.otf",
+  variable: "--font-albragrotesk",
+  weight: "400",
+});
+
+const albragroteskmedium = localFont({
+  src: "./fonts/AlbraGrotesk-Medium.otf",
+  variable: "--font-albragroteskmedium",
+  weight: "500",
+});
+
 
 /**
  * Generate metadata for the page.
@@ -51,12 +65,6 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-const inter = Inter({
-  variable: "--font-inter",
-  subsets: ["latin"],
-  display: "swap",
-});
-
 export default async function RootLayout({
   children,
 }: {
@@ -65,7 +73,7 @@ export default async function RootLayout({
   const { isEnabled: isDraftMode } = await draftMode();
 
   return (
-    <html lang="en" className={`${inter.variable} bg-white text-black`}>
+    <html lang="en" className={`${albragrotesk.variable} ${albragroteskmedium.variable} bg-white text-black`}>
       <body>
         <section className="min-h-screen pt-24">
           {/* The <Toaster> component is responsible for rendering toast notifications used in /app/client-utils.ts and /app/components/DraftModeToast.tsx */}
