@@ -41,6 +41,7 @@ export default {
           900: "#1b1d27",
           950: "#13141b",
         },
+        selected: "#808080",
         red: {
           50: "#fff6f5",
           100: "#ffe7e5",
