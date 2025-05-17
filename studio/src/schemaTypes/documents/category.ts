@@ -15,10 +15,10 @@ export default {
       type: 'text'
     },
     {
-      name: 'parent',
-      title: 'Parent Category',
-      type: 'reference',
-      to: [{ type: 'category' }]
+      name: 'eagleId',
+      title: 'Eagle ID',
+      type: 'string',
+      description: 'ID of the corresponding folder in Eagle'
     }
   ],
   preview: {

@@ -30,7 +30,7 @@ async function createSampleData() {
       client.create({
         _type: 'category',
         name: 'UI Design',
-        description: 'User interface design inspirations'
+        description: 'User interface design elements'
       }),
       client.create({
         _type: 'category',
@@ -62,10 +62,10 @@ async function createSampleData() {
 
     console.log('Created projects:', projects.map(p => p.name))
 
-    // Create design inspirations without file references for now
+    // Create elements without file references for now
     const inspirations = await Promise.all([
       client.create({
-        _type: 'designInspiration',
+        _type: 'elements',
         fileName: 'Modern Dashboard UI',
         fileType: 'image/png',
         colors: ['#2D3436', '#0984E3', '#00B894'],
@@ -78,7 +78,7 @@ async function createSampleData() {
         dateAdded: new Date().toISOString()
       }),
       client.create({
-        _type: 'designInspiration',
+        _type: 'elements',
         fileName: 'Bold Typography Example',
         fileType: 'image/jpeg',
         colors: ['#000000', '#FFFFFF', '#FF0000'],

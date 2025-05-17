@@ -1,6 +1,6 @@
 export default {
-  name: 'designInspiration',
-  title: 'Design Inspiration',
+  name: 'elements',
+  title: 'Elements',
   type: 'document',
   fields: [
     {

@@ -7,14 +7,14 @@ const categoriesWithCountQuery = `
   *[_type == "category"]{
     _id,
     name,
-    "count": count(*[_type == 'designInspiration' && references(^._id)])
+    "count": count(*[_type == 'elements' && references(^._id)])
   }
 `;
 const projectsWithCountQuery = `
   *[_type == "project"]{
     _id,
     name,
-    "count": count(*[_type == 'designInspiration' && references(^._id)])
+    "count": count(*[_type == 'elements' && references(^._id)])
   }
 `;
 
