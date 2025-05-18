@@ -16,10 +16,23 @@ export default {
       validation: Rule => Rule.required()
     },
     {
+      name: 'eagleId',
+      title: 'Eagle ID',
+      type: 'string',
+      description: 'ID of the element in Eagle',
+      validation: Rule => Rule.required()
+    },
+    {
       name: 'file',
       title: 'File',
       type: 'file',
-      validation: Rule => Rule.required()
+    },
+    {
+      name: 'fileUploaded',
+      title: 'File Uploaded',
+      type: 'boolean',
+      description: 'Indicates if the file has been uploaded to Sanity',
+      initialValue: false
     },
     {
       name: 'colors',
@@ -45,6 +58,12 @@ export default {
       }
     },
     {
+      name: 'subCategories',
+      title: 'Subcategories',
+      type: 'array',
+      of: [{ type: 'reference', to: [{ type: 'subcategory' }] }]
+    },
+    {
       name: 'connectedProjects',
       title: 'Connected Projects',
       type: 'array',
@@ -59,6 +78,12 @@ export default {
     {
       name: 'dateAdded',
       title: 'Date Added',
+      type: 'datetime',
+      validation: Rule => Rule.required()
+    },
+    {
+      name: 'dateUpdated',
+      title: 'Date Updated',
       type: 'datetime',
       validation: Rule => Rule.required()
     }

@@ -1,8 +1,12 @@
-import axios from 'axios';
 import dotenv from 'dotenv';
 import path from 'path';
 import { createClient } from '@sanity/client';
 import readline from 'readline';
+import { addOrUpdateCategories } from './sync/addOrUpdateCategories';
+import { promptForRemovals } from './sync/promptForRemovals';
+import { fetchEagleFolders, fetchEagleElements } from './sync/fetch/eagle';
+import { fetchSanityCategories } from './sync/fetch/sanity';
+import { createFolderElements } from './sync/createFolderElements';
 
 dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
@@ -33,77 +37,36 @@ function prompt(question: string): Promise<boolean> {
   });
 }
 
-async function fetchEagleFolders() {
-  const res = await axios.get(
-    `${EAGLE_API}/folder/list`
-  );
-  return res.data.data || [];
-}
-
-async function fetchSanityCategories() {
-  return sanity.fetch(`*[_type == "category"]{_id, name, eagleId}`);
+if (!EAGLE_API) {
+  throw new Error('EAGLE_API environment variable is not set.');
 }
 
 (async () => {
   try {
-    const eagleFolders = await fetchEagleFolders();
-    const sanityCategories = await fetchSanityCategories();
-    const eagleIdToFolder = new Map(eagleFolders.map((f: any) => [f.id, f]));
-    const sanityIdToCategory = new Map(sanityCategories.map((c: any) => [c.eagleId, c]));
+    const eagleFolders = await fetchEagleFolders(EAGLE_API);
+    const sanityCategories = await fetchSanityCategories(sanity);
 
     // Add or update categories
-    for (const folder of eagleFolders) {
-      const cat = sanityIdToCategory.get(folder.id);
-      if (!cat) {
-        // Create new category
-        await sanity.create({
-          _type: 'category',
-          name: folder.name,
-          description: folder.description || '',
-          eagleId: folder.id
-        });
-        console.log(`Added category: ${folder.name} (Eagle ID: ${folder.id})`);
-      } else if ((cat as any).name !== folder.name) {
-        // Update name if needed
-        await sanity.patch((cat as any)._id).set({ name: folder.name }).commit();
-        console.log(`Updated category name to: ${folder.name} (Eagle ID: ${folder.id})`);
-      }
-    }
+    await addOrUpdateCategories(eagleFolders, sanityCategories, sanity);
 
     // Debug: print all Sanity categories and their eagleIds
-    console.log('\nAll Sanity categories and their eagleIds:');
-    sanityCategories.forEach((c: any) => {
-      console.log(`- ${c.name} (eagleId: ${c.eagleId})`);
-    });
+    // console.log('\nAll Sanity categories and their eagleIds:');
+    // sanityCategories.forEach((c: any) => {
+    //   console.log(`- ${c.name} (eagleId: ${c.eagleId})`);
+    // });
+
+    // Iterate through all Eagle folders
+    for (const folder of eagleFolders) {
+      const elementCount = folder.imageCount !== undefined ? folder.imageCount : 'N/A';
+      console.log(`Folder: ${folder.name} (ID: ${folder.id}) - Elements: ${elementCount}`);
+      const elements = await fetchEagleElements(EAGLE_API, folder.id);
+      // Find the main category reference
+      const mainCategoryRef = sanityCategories.find((c: any) => c.eagleId === folder.id)?._id;
+      await createFolderElements(folder, elements, mainCategoryRef, sanity);
+    }
 
     // Prompt for removals (including missing/empty eagleId)
-    const eagleIds = new Set(eagleFolders.map((f: any) => f.id));
-    const toRemove = sanityCategories.filter((c: any) => !c.eagleId || !eagleIds.has(c.eagleId));
-    console.log('\nCategories flagged for removal:', toRemove.map((c: any) => `${c.name} (eagleId: ${c.eagleId})`));
-    if (toRemove.length > 0) {
-      console.log('\nCategories in Sanity not found in Eagle or missing eagleId:');
-      for (const c of toRemove) {
-        console.log(`- ${c.name} (eagleId: ${c.eagleId})`);
-        const confirm = await prompt(`Remove this category and all documents referencing it? (${c.name})`);
-        if (confirm) {
-          // Find all documents referencing this category
-          const referencingDocs = await sanity.fetch(
-            '*[references($catId)]{_id, _type}',
-            { catId: c._id }
-          );
-          if (referencingDocs.length > 0) {
-            for (const doc of referencingDocs) {
-              await sanity.delete(doc._id);
-              console.log(`  Removed referencing document: ${doc._id} (type: ${doc._type})`);
-            }
-          }
-          await sanity.delete(c._id);
-          console.log(`Removed category: ${c.name} (eagleId: ${c.eagleId})`);
-        } else {
-          console.log(`Skipped removal of category: ${c.name}`);
-        }
-      }
-    }
+    await promptForRemovals(eagleFolders, sanityCategories, sanity, prompt);
     rl.close();
   } catch (err) {
     console.error('Sync failed:', err);

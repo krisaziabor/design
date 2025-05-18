@@ -45,6 +45,10 @@ export default function Sidebar() {
       ? categories.reduce((sum, c) => sum + (c.count || 0), 0)
       : projects.reduce((sum, p) => sum + (p.count || 0), 0);
 
+  // Sort categories and projects alphabetically by name
+  const sortedCategories = [...categories].sort((a, b) => a.name.localeCompare(b.name));
+  const sortedProjects = [...projects].sort((a, b) => a.name.localeCompare(b.name));
+
   return (
     <aside className="w-64 min-h-screen bg-white flex flex-col pt-8 pb-8 pl-8 pr-4">
       <div className="flex flex-col w-full h-full flex-1 justify-between">
@@ -87,7 +91,7 @@ export default function Sidebar() {
           {loading ? (
             <span className="text-xs text-gray-400">Loading...</span>
           ) : view === 'tags' ? (
-            categories.map((cat) => (
+            sortedCategories.map((cat) => (
               <div key={cat._id} className="flex items-center w-full justify-between">
                 <span className="text-sm  text-black" style={{ fontFamily: 'var(--font-albragrotesk)' }}>{cat.name}</span>
                 <span className="text-sm  text-black" style={{ fontFamily: 'var(--font-albragrotesk)' }}>{cat.count}</span>
@@ -98,7 +102,7 @@ export default function Sidebar() {
               <div className="mb-3 text-xs text-gray-500" style={{ fontFamily: 'var(--font-albragrotesk)' }}>
                 Note: Not every element in the library is linked to a project. To view all elements, toggle the Tags view instead.
               </div>
-              {projects.map((proj) => (
+              {sortedProjects.map((proj) => (
                 <div key={proj._id} className="flex items-center w-full justify-between">
                   <span className="text-sm  text-black" style={{ fontFamily: 'var(--font-albragrotesk)' }}>{proj.name}</span>
                   <span className="text-sm  text-black" style={{ fontFamily: 'var(--font-albragrotesk)' }}>{proj.count}</span>
