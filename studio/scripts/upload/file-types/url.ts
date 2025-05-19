@@ -26,25 +26,47 @@ export async function handleUrlFileType(eagleId: string, sanity: any, accessKey?
     console.warn(`No element found in Sanity with eagleId ${eagleId} or missing url.`);
     return null;
   }
-  const screenshotUrl = `https://api.screenshotone.com/take?url=${encodeURIComponent(result.url)}&access_key=${key}`;
-  let screenshotBuffer;
+
+  // 1. Get screenshot for thumbnail
+  const thumbnailScreenshotUrl = `https://api.screenshotone.com/take?url=${encodeURIComponent(result.url)}&access_key=${key}`;
+  let thumbnailBuffer;
   try {
-    const response = await axios.get(screenshotUrl, { responseType: 'arraybuffer' });
-    screenshotBuffer = Buffer.from(response.data);
-    // console.log(`Fetched screenshot for URL: ${result.url}`);
+    const response = await axios.get(thumbnailScreenshotUrl, { responseType: 'arraybuffer' });
+    thumbnailBuffer = Buffer.from(response.data);
   } catch (err) {
-    console.error(`Failed to fetch screenshot for URL: ${result.url}`, err);
+    console.error(`Failed to fetch thumbnail screenshot for URL: ${result.url}`, err);
     return null;
   }
-  // Upload the screenshot to Sanity and patch the element's file property
-  let uploadedAsset;
+  let uploadedThumbnailAsset;
   try {
-    uploadedAsset = await sanity.assets.upload('file', screenshotBuffer, { filename: `${result.fileName || eagleId}_screenshot.png` });
+    uploadedThumbnailAsset = await sanity.assets.upload('image', thumbnailBuffer, { filename: `${result.fileName || eagleId}_thumbnail.png` });
   } catch (err) {
-    console.error('Failed to upload screenshot to Sanity:', err);
+    console.error('Failed to upload thumbnail screenshot to Sanity:', err);
     return null;
   }
-  const patched = await sanity.patch(result._id).set({ file: { _type: 'file', asset: { _type: 'reference', _ref: uploadedAsset._id } } }).commit();
-  // console.log(`Uploaded screenshot for eagleId ${eagleId} to Sanity.`);
+
+  // 2. Get full-page screenshot for file property
+  const fullPageScreenshotUrl = `https://api.screenshotone.com/take?full_page=true&url=${encodeURIComponent(result.url)}&access_key=${key}`;
+  let fileBuffer;
+  try {
+    const response = await axios.get(fullPageScreenshotUrl, { responseType: 'arraybuffer' });
+    fileBuffer = Buffer.from(response.data);
+  } catch (err) {
+    console.error(`Failed to fetch full-page screenshot for URL: ${result.url}`, err);
+    return null;
+  }
+  let uploadedFileAsset;
+  try {
+    uploadedFileAsset = await sanity.assets.upload('file', fileBuffer, { filename: `${result.fileName || eagleId}_fullpage.png` });
+  } catch (err) {
+    console.error('Failed to upload full-page screenshot to Sanity:', err);
+    return null;
+  }
+
+  // Patch the element: set thumbnail and file
+  const patched = await sanity.patch(result._id).set({
+    thumbnail: { _type: 'image', asset: { _type: 'reference', _ref: uploadedThumbnailAsset._id } },
+    file: { _type: 'file', asset: { _type: 'reference', _ref: uploadedFileAsset._id } }
+  }).commit();
   return patched;
 } 

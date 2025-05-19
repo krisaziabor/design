@@ -23,6 +23,12 @@ export default {
       validation: Rule => Rule.required()
     },
     {
+      name: 'thumbnail',
+      title: 'Thumbnail',
+      type: 'image',
+      description: 'Thumbnail preview of the element'
+    },
+    {
       name: 'file',
       title: 'File',
       type: 'file',
