@@ -10,6 +10,14 @@ const categoriesWithCountQuery = `
     "count": count(*[_type == 'elements' && references(^._id)])
   }
 `;
+const subcategoriesWithCountQuery = `
+  *[_type == "subcategory"]{
+    _id,
+    name,
+    parentCategory->{_id},
+    "count": count(*[_type == 'elements' && references(^._id)])
+  }
+`;
 const projectsWithCountQuery = `
   *[_type == "project"]{
     _id,
@@ -18,21 +26,26 @@ const projectsWithCountQuery = `
   }
 `;
 
-export default function Sidebar() {
+export default function Sidebar({ onSelect }: { onSelect: (filter: { type: 'all' | 'category' | 'subcategory', id?: string }) => void }) {
   // State for toggling between Tags and Projects
   const [view, setView] = useState<'tags' | 'projects'>('tags');
-  const [categories, setCategories] = useState<{ _id: string; name: string; count: number }[]>([]);
-  const [projects, setProjects] = useState<{ _id: string; name: string; count: number }[]>([]);
+  const [categories, setCategories] = useState<any[]>([]);
+  const [subcategories, setSubcategories] = useState<any[]>([]);
+  const [projects, setProjects] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [openCategory, setOpenCategory] = useState<string | null>(null);
+  const [selected, setSelected] = useState<{ type: 'all' | 'category' | 'subcategory', id?: string }>({ type: 'all' });
 
   useEffect(() => {
     async function fetchData() {
       setLoading(true);
-      const [cats, projs] = await Promise.all([
+      const [cats, subs, projs] = await Promise.all([
         clientPublic.fetch(categoriesWithCountQuery),
+        clientPublic.fetch(subcategoriesWithCountQuery),
         clientPublic.fetch(projectsWithCountQuery),
       ]);
       setCategories(cats || []);
+      setSubcategories(subs || []);
       setProjects(projs || []);
       setLoading(false);
     }
@@ -49,15 +62,39 @@ export default function Sidebar() {
   const sortedCategories = [...categories].sort((a, b) => a.name.localeCompare(b.name));
   const sortedProjects = [...projects].sort((a, b) => a.name.localeCompare(b.name));
 
+  // Group subcategories by parentCategory._id
+  const subcategoriesByParent: Record<string, any[]> = {};
+  for (const sub of subcategories) {
+    if (!sub.parentCategory?._id) continue;
+    if (!subcategoriesByParent[sub.parentCategory._id]) subcategoriesByParent[sub.parentCategory._id] = [];
+    subcategoriesByParent[sub.parentCategory._id].push(sub);
+  }
+
+  function handleSelectAll() {
+    setSelected({ type: 'all' });
+    setOpenCategory(null); // collapse all categories
+    onSelect({ type: 'all' });
+  }
+  function handleSelectCategory(catId: string) {
+    setSelected({ type: 'category', id: catId });
+    setOpenCategory(openCategory === catId ? null : catId);
+    onSelect({ type: 'category', id: catId });
+  }
+  function handleSelectSubcategory(subId: string, parentId: string) {
+    setSelected({ type: 'subcategory', id: subId });
+    setOpenCategory(parentId); // keep parent open
+    onSelect({ type: 'subcategory', id: subId });
+  }
+
   return (
     <aside className="w-64 min-h-screen bg-white flex flex-col pt-8 pb-8 pl-8 pr-4">
       <div className="flex flex-col w-full h-full flex-1 justify-between">
         {/* Top controls section container */}
         <div className="w-full flex flex-col gap-1">
           {/* Group 1: All with count aligned right */}
-          <div className="flex items-center w-full justify-between">
-            <span className="text-sm text-selected" style={{ fontFamily: 'var(--font-albragrotesk)' }}>All</span>
-            <span className="text-sm text-selected" style={{ fontFamily: 'var(--font-albragrotesk)' }}>{allCount}</span>
+          <div className="flex items-center w-full justify-between cursor-pointer" onClick={handleSelectAll}>
+            <span className={`text-sm ${selected.type === 'all' ? 'text-gray-500' : 'text-black'}`} style={{ fontFamily: 'var(--font-albragrotesk)' }}>All</span>
+            <span className={`text-sm ${selected.type === 'all' ? 'text-gray-500' : 'text-black'}`} style={{ fontFamily: 'var(--font-albragrotesk)' }}>{allCount}</span>
           </div>
           {/* Group 2: Tags | Projects with vertical bar and toggle */}
           <div className="flex items-center w-full">
@@ -92,10 +129,30 @@ export default function Sidebar() {
             <span className="text-xs text-gray-400">Loading...</span>
           ) : view === 'tags' ? (
             sortedCategories.map((cat) => (
-              <div key={cat._id} className="flex items-center w-full justify-between">
-                <span className="text-sm  text-black" style={{ fontFamily: 'var(--font-albragrotesk)' }}>{cat.name}</span>
-                <span className="text-sm  text-black" style={{ fontFamily: 'var(--font-albragrotesk)' }}>{cat.count}</span>
-              </div>
+              <React.Fragment key={cat._id}>
+                <div
+                  className={`flex items-center w-full justify-between cursor-pointer`}
+                  onClick={() => handleSelectCategory(cat._id)}
+                >
+                  <span className={`text-sm ${((selected.type === 'category' && selected.id === cat._id) || (selected.type === 'subcategory' && openCategory === cat._id)) ? 'text-gray-500' : 'text-black'}`} style={{ fontFamily: 'var(--font-albragrotesk)' }}>{cat.name}</span>
+                  <span className={`text-sm ${((selected.type === 'category' && selected.id === cat._id) || (selected.type === 'subcategory' && openCategory === cat._id)) ? 'text-gray-500' : 'text-black'}`} style={{ fontFamily: 'var(--font-albragrotesk)' }}>{cat.count}</span>
+                </div>
+                {/* Subcategories, if this category is open */}
+                {openCategory === cat._id && subcategoriesByParent[cat._id] && (
+                  <div className="ml-4 flex flex-col gap-1">
+                    {subcategoriesByParent[cat._id].map((sub) => (
+                      <div
+                        key={sub._id}
+                        className={`flex items-center w-full justify-between cursor-pointer`}
+                        onClick={() => handleSelectSubcategory(sub._id, cat._id)}
+                      >
+                        <span className={`text-xs ${selected.type === 'subcategory' && selected.id === sub._id ? 'text-gray-500' : 'text-black'}`} style={{ fontFamily: 'var(--font-albragrotesk)' }}>{sub.name}</span>
+                        <span className={`text-xs ${selected.type === 'subcategory' && selected.id === sub._id ? 'text-gray-500' : 'text-black'}`} style={{ fontFamily: 'var(--font-albragrotesk)' }}>{sub.count}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </React.Fragment>
             ))
           ) : (
             <>
