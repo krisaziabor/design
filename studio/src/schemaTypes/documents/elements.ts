@@ -42,6 +42,12 @@ export default {
       description: 'Extracted colors from the design'
     },
     {
+      name: 'url',
+      title: 'URL',
+      type: 'string',
+      description: 'URL of the element in Eagle'
+    },
+    {
       name: 'mainCategory',
       title: 'Main Category',
       type: 'reference',
