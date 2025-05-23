@@ -2,6 +2,7 @@
 
 import { isCorsOriginError } from "next-sanity";
 import { toast } from "sonner";
+import { format, isToday, isYesterday } from "date-fns";
 
 export function handleError(error: unknown) {
   if (isCorsOriginError(error)) {
@@ -27,4 +28,12 @@ export function handleError(error: unknown) {
       duration: Infinity,
     });
   }
+}
+
+export function formatCommentDate(dateString: string | undefined): string {
+  if (!dateString) return '';
+  const date = new Date(dateString);
+  if (isToday(date)) return 'Today';
+  if (isYesterday(date)) return 'Yesterday';
+  return format(date, 'LLLL d, yyyy');
 }

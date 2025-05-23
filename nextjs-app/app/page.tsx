@@ -38,7 +38,7 @@ export default function Page() {
   return (
     <div className="min-h-screen flex flex-row bg-white">
       <div className="sticky top-0 h-screen z-10">
-        <Sidebar onSelect={setSelectedFilter} />
+        <Sidebar onSelect={setSelectedFilter} selected={selectedFilter} />
       </div>
       {/* Main Content */}
       <main className="flex-1 flex flex-col items-center justify-start px-4 py-8 overflow-y-auto max-h-screen">

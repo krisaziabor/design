@@ -30,8 +30,21 @@ export default {
     },
     {
       name: 'file',
-      title: 'File',
+      title: 'File (PDF or other)',
       type: 'file',
+      options: {
+        accept: 'application/pdf'
+      },
+      description: 'Upload a PDF or other file type here.'
+    },
+    {
+      name: 'image',
+      title: 'Image',
+      type: 'image',
+      options: {
+        hotspot: true
+      },
+      description: 'Upload an image here (JPG, PNG, etc.)'
     },
     {
       name: 'fileUploaded',
@@ -85,7 +98,7 @@ export default {
       name: 'comments',
       title: 'Comments',
       type: 'array',
-      of: [{ type: 'text' }]
+      of: [{ type: 'comment' }]
     },
     {
       name: 'dateAdded',

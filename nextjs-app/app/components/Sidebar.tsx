@@ -26,7 +26,7 @@ const projectsWithCountQuery = `
   }
 `;
 
-export default function Sidebar({ onSelect }: { onSelect: (filter: { type: 'all' | 'category' | 'subcategory', id?: string }) => void }) {
+export default function Sidebar({ onSelect, selected: selectedProp }: { onSelect: (filter: { type: 'all' | 'category' | 'subcategory', id?: string }) => void, selected?: { type: 'all' | 'category' | 'subcategory', id?: string } }) {
   // State for toggling between Tags and Projects
   const [view, setView] = useState<'tags' | 'projects'>('tags');
   const [categories, setCategories] = useState<any[]>([]);
@@ -34,7 +34,13 @@ export default function Sidebar({ onSelect }: { onSelect: (filter: { type: 'all'
   const [projects, setProjects] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [openCategory, setOpenCategory] = useState<string | null>(null);
-  const [selected, setSelected] = useState<{ type: 'all' | 'category' | 'subcategory', id?: string }>({ type: 'all' });
+  const [selected, setSelected] = useState<{ type: 'all' | 'category' | 'subcategory', id?: string }>(selectedProp || { type: 'all' });
+
+  useEffect(() => {
+    if (selectedProp && (selectedProp.type !== selected.type || selectedProp.id !== selected.id)) {
+      setSelected(selectedProp);
+    }
+  }, [selectedProp, selected.id, selected.type]);
 
   useEffect(() => {
     async function fetchData() {

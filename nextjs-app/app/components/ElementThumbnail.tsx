@@ -1,6 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import cleanUrl from "@/app/components/cleanUrl";
+import Link from "next/link";
 
 // Custom hook to detect if an element is in view
 function useInView(ref: React.RefObject<HTMLElement>, options?: IntersectionObserverInit) {
@@ -30,7 +31,15 @@ function ElementThumbnail({ element }: { element: any }) {
   } else if (
     element.file &&
     element.file.asset?._ref &&
-    (imageTypes.includes((element.fileType || '').toLowerCase()) || (element.fileType || '').toLowerCase() === 'svg')
+    (element.fileType || '').toLowerCase() === 'gif'
+  ) {
+    // GIFs: always use image, not video
+    const assetId = element.file.asset._ref.replace("file-", "").replace(/-.*/, "");
+    imgUrl = `https://cdn.sanity.io/files/${process.env.NEXT_PUBLIC_SANITY_PROJECT_ID}/${process.env.NEXT_PUBLIC_SANITY_DATASET}/${assetId}.gif`;
+  } else if (
+    element.file &&
+    element.file.asset?._ref &&
+    imageTypes.includes((element.fileType || '').toLowerCase())
   ) {
     const assetId = element.file.asset._ref.replace("file-", "").replace(/-.*/, "");
     const ext = (element.fileType || '').toLowerCase() === 'svg' ? 'svg' : 'jpg';
@@ -40,9 +49,13 @@ function ElementThumbnail({ element }: { element: any }) {
     element.file.asset?._ref &&
     videoTypes.includes((element.fileType || '').toLowerCase())
   ) {
-    const assetId = element.file.asset._ref.replace("file-", "").replace(/-.*/, "");
-    const ext = element.fileType ? element.fileType.toLowerCase() : 'mp4';
-    videoUrl = `https://cdn.sanity.io/files/${process.env.NEXT_PUBLIC_SANITY_PROJECT_ID}/${process.env.NEXT_PUBLIC_SANITY_DATASET}/${assetId}.${ext}`;
+    // Only mov/mp4/gif (but gif is handled above)
+    const fileTypeLower = (element.fileType || '').toLowerCase();
+    if (fileTypeLower !== 'gif') {
+      const assetId = element.file.asset._ref.replace("file-", "").replace(/-.*/, "");
+      const ext = element.fileType ? element.fileType.toLowerCase() : 'mp4';
+      videoUrl = `https://cdn.sanity.io/files/${process.env.NEXT_PUBLIC_SANITY_PROJECT_ID}/${process.env.NEXT_PUBLIC_SANITY_DATASET}/${assetId}.${ext}`;
+    }
   } else if (element.file && element.file.asset?._ref) {
     // fallback to .png for non-image fileTypes (legacy logic)
     const assetId = element.file.asset._ref.replace("file-", "").replace(/-.*/, "");
@@ -68,38 +81,42 @@ function ElementThumbnail({ element }: { element: any }) {
 
   // Set a container with no fixed height, but constrain the media to a max height and maintain aspect ratio
   return (
-    <div className="relative flex flex-col items-end justify-end group w-full" style={{ minHeight: '0' }}>
-      {videoUrl ? (
-        <video
-          ref={videoRef}
-          src={videoUrl}
-          className="w-full max-h-[420px] object-contain rounded-none border-none shadow-none bg-transparent"
-          muted
-          loop
-          playsInline
-          style={{ display: 'block', width: '100%' }}
-        />
-      ) : (
-        <img
-          src={imgUrl}
-          alt={element.fileName || element.eagleId}
-          className="w-full max-h-[420px] object-contain rounded-none border-none shadow-none bg-transparent"
-          style={{ display: 'block', width: '100%' }}
-        />
-      )}
-      {urlLabel && element.url && (
-        <a
-          href={element.url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="absolute left-0 bottom-0 m-0 px-2 py-0.5 text-[10px] font-normal bg-black text-white rounded-tr opacity-0 group-hover:opacity-100 transition-opacity duration-150 cursor-pointer flex items-center gap-1"
-          style={{ borderTopRightRadius: 4, fontFamily: 'var(--font-albragrotesk), sans-serif', letterSpacing: '0.01em' }}
-          tabIndex={-1}
-        >
-          {urlLabel}
-        </a>
-      )}
-    </div>
+    <Link href={`/elements/${element._id}`} className="block w-full h-full">
+      <div className="relative flex flex-col items-end justify-end group w-full" style={{ minHeight: '0' }}>
+        {videoUrl ? (
+          <video
+            ref={videoRef}
+            src={videoUrl}
+            className="w-full max-h-[420px] object-contain rounded-none border-none shadow-none bg-transparent"
+            muted
+            loop
+            playsInline
+            poster={imgUrl}
+            style={{ display: 'block', width: '100%' }}
+            autoPlay={inView}
+          />
+        ) : (
+          <img
+            src={imgUrl}
+            alt={element.fileName || element.eagleId}
+            className="w-full max-h-[420px] object-contain rounded-none border-none shadow-none bg-transparent"
+            style={{ display: 'block', width: '100%' }}
+          />
+        )}
+        {urlLabel && element.url && (
+          <a
+            href={element.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="absolute left-0 bottom-0 m-0 px-2 py-0.5 text-[10px] font-normal bg-black text-white rounded-tr opacity-0 group-hover:opacity-100 transition-opacity duration-150 cursor-pointer flex items-center gap-1"
+            style={{ borderTopRightRadius: 4, fontFamily: 'var(--font-albragrotesk), sans-serif', letterSpacing: '0.01em' }}
+            tabIndex={-1}
+          >
+            {urlLabel}
+          </a>
+        )}
+      </div>
+    </Link>
   );
 }
 
