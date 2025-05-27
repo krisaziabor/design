@@ -156,6 +156,15 @@ export default function Sidebar({
     fetchData();
     // Expose refreshSidebar for other components
     (window as any).refreshSidebar = fetchData;
+
+    // Add event listener to refetch on window focus
+    function handleFocus() {
+      fetchData();
+    }
+    window.addEventListener('focus', handleFocus);
+    return () => {
+      window.removeEventListener('focus', handleFocus);
+    };
   }, []);
 
   // Calculate total inspirations for 'All'
@@ -235,24 +244,21 @@ export default function Sidebar({
         {infoMode ? (
           <div className="w-full flex flex-col gap-2 mb-6">
             <span
-              className={`text-sm cursor-pointer ${infoTab === 'information' ? 'text-foreground' : 'text-gray-500'} hover:text-foreground`}
-              style={{ fontFamily: 'var(--font-albragrotesk)' }}
+              className={`text-sm cursor-pointer ${infoTab === 'information' ? 'text-foreground' : 'text-gray-500'} hover:text-foreground font-[family-name:var(--font-albragrotesk)]`}
               onClick={() => setInfoTab('information')}
             >
               Information
             </span>
 
             <span
-              className={`text-sm cursor-pointer ${infoTab === 'colophon' ? 'text-foreground' : 'text-gray-500'} hover:text-foreground`}
-              style={{ fontFamily: 'var(--font-albragrotesk)' }}
+              className={`text-sm cursor-pointer ${infoTab === 'colophon' ? 'text-foreground' : 'text-gray-500'} hover:text-foreground font-[family-name:var(--font-albragrotesk)]`}
               onClick={() => setInfoTab('colophon')}
             >
               Colophon
             </span>
 
             <span
-              className={`text-sm cursor-pointer ${infoTab === 'login' ? 'text-foreground' : 'text-gray-500'} hover:text-foreground`}
-              style={{ fontFamily: 'var(--font-albragrotesk)' }}
+              className={`text-sm cursor-pointer ${infoTab === 'login' ? 'text-foreground' : 'text-gray-500'} hover:text-foreground font-[family-name:var(--font-albragrotesk)]`}
               onClick={() => setInfoTab('login')}
             >
               Sign in
@@ -263,19 +269,17 @@ export default function Sidebar({
             {/* Group 1: All with count aligned right */}
 
             <div
-              className="flex items-center w-full justify-between cursor-pointer"
+              className="flex items-center w-full justify-between cursor-pointer font-[family-name:var(--font-albragrotesk)]"
               onClick={handleSelectAll}
             >
               <span
-                className={getSidebarItemClass(false, true)}
-                style={{ fontFamily: 'var(--font-albragrotesk)' }}
+                className= {getSidebarItemClass(false, true)}
               >
                 All
               </span>
 
               <span
                 className={getSidebarItemClass(false, true)}
-                style={{ fontFamily: 'var(--font-albragrotesk)' }}
               >
                 {allCount}
               </span>
@@ -283,10 +287,9 @@ export default function Sidebar({
 
             {/* Group 2: Tags | Projects with vertical bar and toggle */}
 
-            <div className="flex items-center w-full">
+            <div className="flex items-center w-full font-[family-name:var(--font-albragrotesk)]">
               <button
                 className={getSidebarButtonClass(view === 'tags')}
-                style={{ fontFamily: 'var(--font-albragrotesk)' }}
                 onClick={() => setView('tags')}
                 aria-pressed={view === 'tags'}
                 type="button"
@@ -294,11 +297,10 @@ export default function Sidebar({
                 Tags
               </button>
 
-              <span className="h-4 w-px bg-foreground mx-2" />
+              <span className="h-4 w-px bg-foreground mx-2 font-[family-name:var(--font-albragrotesk)]" />
 
               <button
                 className={getSidebarButtonClass(view === 'projects')}
-                style={{ fontFamily: 'var(--font-albragrotesk)' }}
                 onClick={() => setView('projects')}
                 aria-pressed={view === 'projects'}
                 type="button"
@@ -311,8 +313,7 @@ export default function Sidebar({
 
             <div className="w-full">
               <span
-                className="text-sm text-foreground"
-                style={{ fontFamily: 'var(--font-albragrotesk)' }}
+                className="text-sm text-foreground font-[family-name:var(--font-albragrotesk)]"
               >
                 Search
               </span>
@@ -340,7 +341,6 @@ export default function Sidebar({
                           (selected.type === 'category' && selected.id === cat._id) ||
                             (selected.type === 'subcategory' && openCategory === cat._id)
                         )}
-                        style={{ fontFamily: 'var(--font-albragrotesk)' }}
                       >
                         {cat.name}
                       </span>
@@ -349,7 +349,6 @@ export default function Sidebar({
                           (selected.type === 'category' && selected.id === cat._id) ||
                             (selected.type === 'subcategory' && openCategory === cat._id)
                         )}
-                        style={{ fontFamily: 'var(--font-albragrotesk)' }}
                       >
                         {cat.count}
                       </span>
@@ -369,7 +368,6 @@ export default function Sidebar({
                                 className={getSidebarSubItemClass(
                                   selected.type === 'subcategory' && selected.id === sub._id
                                 )}
-                                style={{ fontFamily: 'var(--font-albragrotesk)' }}
                               >
                                 {sub.name}
                               </span>
@@ -377,7 +375,6 @@ export default function Sidebar({
                                 className={getSidebarSubItemClass(
                                   selected.type === 'subcategory' && selected.id === sub._id
                                 )}
-                                style={{ fontFamily: 'var(--font-albragrotesk)' }}
                               >
                                 {sub.count}
                               </span>
@@ -393,7 +390,6 @@ export default function Sidebar({
               <>
                 <div
                   className="mb-3 text-xs text-gray-500"
-                  style={{ fontFamily: 'var(--font-albragrotesk)' }}
                 >
                   Note: Not every element in the library is linked to a project. To view all
                   elements, toggle the Tags view instead.
@@ -409,7 +405,6 @@ export default function Sidebar({
                     >
                       <span
                         className="text-sm text-foreground"
-                        style={{ fontFamily: 'var(--font-albragrotesk)' }}
                       >
                         {proj.name}
                       </span>
@@ -427,7 +422,6 @@ export default function Sidebar({
           {infoMode ? (
             <span
               className={getSidebarBottomLinkClass(true)}
-              style={{ fontFamily: 'var(--font-albragrotesk)' }}
               onClick={() => setInfoMode(false)}
               tabIndex={0}
               role="button"
@@ -437,7 +431,6 @@ export default function Sidebar({
           ) : (
             <span
               className={getSidebarBottomLinkClass(true)}
-              style={{ fontFamily: 'var(--font-albragrotesk)' }}
               onClick={() => setInfoMode(true)}
               tabIndex={0}
               role="button"

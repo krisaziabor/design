@@ -170,29 +170,27 @@ export default function ActionSidebar({ element, loading, onCommentAdded }: Acti
 
         <div className="w-full">
           <div
-            className="text-sm font-semibold text-gray-700 dark:text-gray-200 mb-2"
-            style={{ fontFamily: 'var(--font-albragrotesk)' }}
+            className="text-sm font-semibold text-gray-700 dark:text-gray-200 mb-2 font-[family-name:var(--font-albragrotesk)]"
           >
             Connected projects
           </div>
 
           {loading ? (
-            <div className="text-sm text-gray-400">Loading...</div>
+            <div className="text-sm text-gray-400 font-[family-name:var(--font-albragrotesk)]">Loading...</div>
           ) : (
             Array.isArray(element?.connectedProjects) && element.connectedProjects.length > 0 ? (
               <ul className="flex flex-col gap-1">
                 {element.connectedProjects.map((proj: any, idx: number) => (
                   <li
                     key={proj._id || proj._ref || idx}
-                    className="text-sm text-black dark:text-white"
-                    style={{ fontFamily: 'var(--font-albragrotesk)' }}
+                    className="text-sm text-black dark:text-white font-[family-name:var(--font-albragrotesk)]"
                   >
                     {proj.name || proj.title || 'Project'}
                   </li>
                 ))}
               </ul>
             ) : (
-              <div className="text-sm text-gray-400">
+              <div className="text-sm text-gray-400 font-[family-name:var(--font-albragrotesk)]">
                 This element is not connected to any projects.
               </div>
             )
@@ -201,8 +199,7 @@ export default function ActionSidebar({ element, loading, onCommentAdded }: Acti
           {/* Add a new project */}
           <div className="w-full flex flex-col gap-2 mt-4">
             <span
-              className="text-sm text-blue-600 cursor-pointer select-none"
-              style={{ fontFamily: 'var(--font-albragrotesk)' }}
+              className="text-sm text-blue-600 cursor-pointer select-none font-[family-name:var(--font-albragrotesk)]"
               onClick={() => setShowProjectModal((v) => !v)}
             >
               Update connected projects
@@ -211,9 +208,9 @@ export default function ActionSidebar({ element, loading, onCommentAdded }: Acti
               <div className="bg-white border rounded shadow p-4 mt-2 z-10">
                 <div className="mb-2 font-semibold text-black">Select projects to connect</div>
                 {projectLoading ? (
-                  <div className="text-gray-400">Loading...</div>
+                  <div className="text-gray-400 font-[family-name:var(--font-albragrotesk)]">Loading...</div>
                 ) : projectError ? (
-                  <div className="text-red-500 text-xs">{projectError}</div>
+                  <div className="text-red-500 text-xs font-[family-name:var(--font-albragrotesk)]">{projectError}</div>
                 ) : (
                   <div className="flex flex-col gap-2 max-h-48 overflow-y-auto">
                     {allProjects.map((proj) => (
@@ -224,14 +221,13 @@ export default function ActionSidebar({ element, loading, onCommentAdded }: Acti
                           onChange={() => handleProjectCheckbox(proj._id)}
                           className="accent-blue-600"
                         />
-                        <span className="text-sm text-black">{proj.name}</span>
+                        <span className="text-sm text-black font-[family-name:var(--font-albragrotesk)]">{proj.name}</span>
                       </label>
                     ))}
                   </div>
                 )}
                 <button
-                  className="mt-4 text-sm font-semibold text-blue-600 cursor-pointer focus:outline-none bg-transparent border-none p-0 text-left"
-                  style={{ fontFamily: 'var(--font-albragrotesk)' }}
+                  className="mt-4 text-sm font-semibold text-blue-600 cursor-pointer focus:outline-none bg-transparent border-none p-0 text-left font-[family-name:var(--font-albragrotesk)]"
                   onClick={handleUpdateProjects}
                   disabled={projectLoading}
                 >
@@ -247,16 +243,14 @@ export default function ActionSidebar({ element, loading, onCommentAdded }: Acti
         <div className="w-full flex flex-col gap-3 my-auto">
           <div className="flex items-center mb-1">
             <span
-              className="text-sm font-semibold text-gray-700 dark:text-gray-200"
-              style={{ fontFamily: 'var(--font-albragrotesk)' }}
+              className="text-sm font-semibold text-gray-700 dark:text-gray-200 font-[family-name:var(--font-albragrotesk)]"
             >
               Latest comment
             </span>
 
             <button
               type="button"
-              className="text-sm font-semibold text-gray-700 cursor-pointer ml-1 focus:outline-none bg-transparent border-none p-0"
-              style={{ fontFamily: 'var(--font-albragrotesk)' }}
+              className="text-sm font-semibold text-gray-700 cursor-pointer ml-1 focus:outline-none bg-transparent border-none p-0 font-[family-name:var(--font-albragrotesk)]"
               onClick={() => {
                 const el = document.getElementById('comment-section');
 
@@ -268,13 +262,12 @@ export default function ActionSidebar({ element, loading, onCommentAdded }: Acti
           </div>
 
           {loading ? (
-            <div className="text-sm text-gray-400">Loading...</div>
+            <div className="text-sm text-gray-400 font-[family-name:var(--font-albragrotesk)]">Loading...</div>
           ) : latestComment ? (
             <div className="mb-2 relative">
               <div className="flex items-center justify-between">
                 <div
-                  className="text-sm text-gray-400 mb-0.5"
-                  style={{ fontFamily: 'var(--font-albragrotesk)' }}
+                  className="text-sm text-gray-400 mb-0.5 font-[family-name:var(--font-albragrotesk)]"
                 >
                   {latestComment.dateAdded ? formatCommentDate(latestComment.dateAdded) : ''}
                 </div>
@@ -295,8 +288,7 @@ export default function ActionSidebar({ element, loading, onCommentAdded }: Acti
               </div>
               {deleteError && <div className="text-xs text-red-500 mb-1">{deleteError}</div>}
               <div
-                className="text-sm text-black dark:text-white"
-                style={{ fontFamily: 'var(--font-albragrotesk)' }}
+                className="text-sm text-black dark:text-white font-[family-name:var(--font-albragrotesk)]"
               >
                 {typeof latestComment.text === 'string' ? latestComment.text : ''}
               </div>
@@ -327,7 +319,7 @@ export default function ActionSidebar({ element, loading, onCommentAdded }: Acti
               )}
             </div>
           ) : (
-            <div className="text-sm text-gray-400">No comments yet.</div>
+            <div className="text-sm text-gray-400 font-[family-name:var(--font-albragrotesk)]">No comments yet.</div>
           )}
 
           {/* Add new comment UI */}
@@ -335,13 +327,12 @@ export default function ActionSidebar({ element, loading, onCommentAdded }: Acti
           {showInput && (
             <div className="mb-2 flex flex-col gap-1">
               <textarea
-                className="w-full border rounded p-1 text-sm text-black dark:text-white bg-white dark:bg-black"
+                className="w-full border rounded p-1 text-sm text-black dark:text-white bg-white dark:bg-black font-[family-name:var(--font-albragrotesk)]"
                 rows={2}
                 value={newComment}
                 onChange={(e) => setNewComment(e.target.value)}
                 disabled={submitting}
                 placeholder="Type your comment..."
-                style={{ fontFamily: 'var(--font-albragrotesk)' }}
               />
 
               {error && <div className="text-xs text-red-500">{error}</div>}
@@ -350,8 +341,7 @@ export default function ActionSidebar({ element, loading, onCommentAdded }: Acti
 
           <button
             type="button"
-            className="text-sm font-semibold text-blue-600 cursor-pointer focus:outline-none bg-transparent border-none p-0 text-left"
-            style={{ fontFamily: 'var(--font-albragrotesk)' }}
+            className="text-sm font-semibold text-blue-600 cursor-pointer focus:outline-none bg-transparent border-none p-0 text-left font-[family-name:var(--font-albragrotesk)]"
             onClick={handleAddComment}
             disabled={submitting}
           >
@@ -374,15 +364,14 @@ export default function ActionSidebar({ element, loading, onCommentAdded }: Acti
                   ></div>
 
                   <span
-                    className="absolute -top-8 left-1/2 -translate-x-1/2 px-2 py-1 text-sm bg-black dark:bg-white text-white dark:text-black rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10"
-                    style={{ fontFamily: 'var(--font-albragrotesk)' }}
+                    className="absolute -top-8 left-1/2 -translate-x-1/2 px-2 py-1 text-sm bg-black dark:bg-white text-white dark:text-black rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10 font-[family-name:var(--font-albragrotesk)]"
                   >
                     {color}
                   </span>
                 </div>
               ))
             ) : (
-              <span className="text-sm text-gray-400">No colors</span>
+              <span className="text-sm text-gray-400 font-[family-name:var(--font-albragrotesk)]">No colors</span>
             )}
           </div>
 
@@ -393,8 +382,7 @@ export default function ActionSidebar({ element, loading, onCommentAdded }: Acti
               href={element.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-1 text-black dark:text-white hover:underline-none focus:underline-none text-sm break-all pl-0"
-              style={{ fontFamily: 'var(--font-albragrotesk)', textDecoration: 'none' }}
+              className="flex items-center gap-1 text-black dark:text-white hover:underline-none focus:underline-none text-sm break-all pl-0 font-[family-name:var(--font-albragrotesk)]"
             >
               <span>{element.url}</span>
 
@@ -420,8 +408,7 @@ export default function ActionSidebar({ element, loading, onCommentAdded }: Acti
 
           {element?.file?.asset?.originalFilename && (
             <div
-              className="text-sm text-black dark:text-white truncate pl-0"
-              style={{ fontFamily: 'var(--font-albragrotesk)' }}
+              className="text-sm text-black dark:text-white truncate pl-0 font-[family-name:var(--font-albragrotesk)]"
             >
               {element.file.asset.originalFilename}
             </div>
@@ -433,8 +420,7 @@ export default function ActionSidebar({ element, loading, onCommentAdded }: Acti
         {element?.dateAdded && (
           <div className="w-full mt-6 mb-4 flex-shrink-0 flex items-center">
             <span
-              className="text-sm text-gray-500"
-              style={{ fontFamily: 'var(--font-albragrotesk)' }}
+              className="text-sm text-gray-500 font-[family-name:var(--font-albragrotesk)]"
             >
               {new Date(element.dateAdded).toLocaleString('en-US', {
                 month: 'long',

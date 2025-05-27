@@ -105,6 +105,8 @@ function ElementThumbnail({
 
   // Video in-view logic
 
+  const [mediaLoaded, setMediaLoaded] = useState(false);
+
   const videoRef = React.useRef<HTMLVideoElement>(null);
 
   const inView = useInView(videoRef);
@@ -148,6 +150,7 @@ function ElementThumbnail({
             poster={imgUrl}
             style={{ display: 'block', width: '100%' }}
             autoPlay={inView}
+            onLoadedData={() => setMediaLoaded(true)}
           />
         ) : (
           <img
@@ -155,23 +158,23 @@ function ElementThumbnail({
             alt={element.fileName || element.eagleId}
             className="w-full max-h-[420px] object-contain rounded-none border-none shadow-none bg-transparent"
             style={{ display: 'block', width: '100%' }}
+            onLoad={() => setMediaLoaded(true)}
           />
         )}
 
-        {urlLabel && element.url && (
+        {mediaLoaded && urlLabel && element.url && (
           <a
             href={element.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="absolute left-0 bottom-0 m-0 px-2 py-0.5 text-[10px] font-normal bg-black dark:bg-white text-white dark:text-black rounded-tr opacity-0 group-hover:opacity-100 transition-opacity duration-150 cursor-pointer flex items-center gap-1"
-            style={{
-              borderTopRightRadius: 4,
-              fontFamily: 'var(--font-albragrotesk), sans-serif',
-              letterSpacing: '0.01em',
-            }}
+            className="absolute left-0 bottom-0 m-2 cursor-pointer flex items-center"
             tabIndex={-1}
+            aria-label="Go to source"
           >
-            {urlLabel}
+            {/* Sideways up arrow icon (rotated arrow) */}
+            <svg width="22" height="22" viewBox="0 0 20 20" fill="black" xmlns="http://www.w3.org/2000/svg" style={{ transform: 'rotate(-45deg)' }} className="opacity-20 group-hover:opacity-100 transition-opacity duration-150">
+              <path d="M5 10H15M15 10L11 6M15 10L11 14" stroke="black" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
           </a>
         )}
       </div>

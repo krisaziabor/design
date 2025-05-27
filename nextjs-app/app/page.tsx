@@ -137,15 +137,13 @@ function PageContent() {
           {infoMode ? (
             infoTab === 'information' ? (
               <div
-                className="w-2/5 text-sm text-black font-normal whitespace-pre-line"
-                style={{ fontFamily: 'var(--font-albragrotesk)' }}
+                className="w-2/5 text-sm text-black font-normal whitespace-pre-line font-[family-name:var(--font-albragrotesk)]"
               >
                 {`The Design Library is the first of several library projects I intend on creating this summer.\n\nScouring the internet for the best websites, brand guidelines, and graphics is my favorite form of procrastination, and I wanted to share this tradition with the web. \n\nThe KAKA Literary Library & Photographers Library are both on the way.\n\nSummer 2025`}
               </div>
             ) : infoTab === 'colophon' ? (
               <div
-                className="w-2/5 text-sm text-black font-normal space-y-2"
-                style={{ fontFamily: 'var(--font-albragrotesk)' }}
+                className="w-2/5 text-sm text-black font-normal space-y-2 font-[family-name:var(--font-albragrotesk)]"
               >
                 <div>
                   Typography &rarr; Albra Grotesk by{' '}
@@ -216,8 +214,7 @@ function PageContent() {
               </div>
             ) : (
               <div
-                className="w-2/5 text-sm text-black font-normal"
-                style={{ fontFamily: 'var(--font-albragrotesk)' }}
+                className="w-2/5 text-sm text-black font-normal font-[family-name:var(--font-albragrotesk)]"
               >
                 Sign in coming soon.
               </div>
@@ -226,7 +223,7 @@ function PageContent() {
             <div className="text-center text-gray-400"></div>
           ) : (
             filteredElements.length === 0 && selectedFilter.type !== 'all' ? (
-              <div className="text-center text-gray-400" style={{ fontFamily: 'var(--font-albragrotesk)' }}>
+              <div className="text-center text-gray-400 font-[family-name:var(--font-albragrotesk)]">
                 No elements found for this {selectedFilter.type}.
               </div>
             ) : (
@@ -245,7 +242,7 @@ function PageContent() {
 
 export default function Page() {
   return (
-    <Suspense fallback={<div className="text-center text-gray-400">Loading...</div>}>
+    <Suspense fallback={<div className="text-center text-gray-400 font-[family-name:var(--font-albragrotesk)]">Loading...</div>}>
       <PageContent />
     </Suspense>
   );

@@ -25,21 +25,24 @@ export default function ProjectPage() {
   const [infoMode, setInfoMode] = useState(false);
   const [infoTab, setInfoTab] = useState<'information' | 'colophon' | 'login'>('information');
   const [projectExists, setProjectExists] = useState(true);
+  const [projectDescription, setProjectDescription] = useState<string | null>(null);
 
   // Sidebar selection state
-  const selectedFilter = { type: 'project', id: id as string };
+  const selectedFilter: { type: 'all' | 'category' | 'subcategory' | 'project'; id?: string } = { type: 'project', id: id as string };
 
   useEffect(() => {
     async function fetchElements() {
       setLoading(true);
-      // Fetch project existence
+      // Fetch project existence and description
       const projectData = await clientNoCdn.fetch('*[_type == "project" && _id == $id][0]', { id });
       if (!projectData) {
         setProjectExists(false);
         setElements([]);
+        setProjectDescription(null);
         setLoading(false);
         return;
       }
+      setProjectDescription(projectData.description || null);
       const data = await clientNoCdn.fetch(
         '*[_type == "elements"]{_id, eagleId, fileType, fileName, file, url, mainCategory, subCategories, thumbnail, dateAdded, connectedProjects[]->}'
       );
@@ -75,22 +78,28 @@ export default function ProjectPage() {
       </div>
       {/* Main Content */}
       <main className="flex-1 flex flex-col items-center px-4 py-8 overflow-y-auto max-h-screen text-black dark:text-white">
-        <h1 className="text-2xl font-bold mb-6" style={{ fontFamily: 'var(--font-albragrotesk)' }}>Project Elements</h1>
+        {projectDescription && (
+          <div className="mb-6 w-full max-w-6xl text-sm text-gray-700 dark:text-gray-200 font-[family-name:var(--font-albragrotesk)]">
+            {projectDescription}
+          </div>
+        )}
         {loading ? (
-          <div className="text-center text-gray-400">Loading...</div>
+          <div className="text-center text-gray-700 font-[family-name:var(--font-albragrotesk)]">One sec...</div>
         ) : !projectExists ? (
-          <div className="text-center text-red-500 text-xl font-bold" style={{ fontFamily: 'var(--font-albragrotesk)' }}>
+          <div className="text-center text-red-500 text-xl font-bold font-[family-name:var(--font-albragrotesk)]">
             Project not found.
           </div>
         ) : elements.length === 0 ? (
-          <div className="text-center text-gray-400" style={{ fontFamily: 'var(--font-albragrotesk)' }}>
+          <div className="text-center text-gray-400 font-[family-name:var(--font-albragrotesk)]">
             No elements found for this project.
           </div>
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 items-stretch">
-            {elements.map((el: any) => (
-              <ElementThumbnail key={el._id} element={el} selectedFilter={selectedFilter} />
-            ))}
+          <div className="w-full max-w-6xl mx-auto">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 items-stretch">
+              {elements.map((el: any) => (
+                <ElementThumbnail key={el._id} element={el} selectedFilter={selectedFilter} />
+              ))}
+            </div>
           </div>
         )}
       </main>
