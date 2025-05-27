@@ -85,22 +85,19 @@ export default function ActionSidebar({ element, loading, onCommentAdded }: Acti
     try {
       const res = await fetch('/api/comments', {
         method: 'POST',
-
         headers: { 'Content-Type': 'application/json' },
-
         body: JSON.stringify({ elementId: element._id, text: newComment }),
       });
-
-      const data = await res.json();
-
+      let data;
+      try {
+        data = await res.json();
+      } catch {
+        data = {};
+      }
       if (!res.ok) throw new Error(data.error || 'Failed to add comment');
-
       setLatestComment(data.comment);
-
       setShowInput(false);
-
       setNewComment('');
-
       if (onCommentAdded) onCommentAdded();
     } catch (err: any) {
       setError(err.message || 'Failed to add comment');
@@ -126,7 +123,12 @@ export default function ActionSidebar({ element, loading, onCommentAdded }: Acti
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ elementId: element._id, projectIds: selectedProjects }),
       });
-      const data = await res.json();
+      let data;
+      try {
+        data = await res.json();
+      } catch {
+        data = {};
+      }
       if (!res.ok) throw new Error(data.error || 'Failed to update projects');
       setShowProjectModal(false);
       if (onCommentAdded) onCommentAdded();
@@ -151,7 +153,12 @@ export default function ActionSidebar({ element, loading, onCommentAdded }: Acti
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ elementId: element._id, commentKey: latestComment._key }),
       });
-      const data = await res.json();
+      let data;
+      try {
+        data = await res.json();
+      } catch {
+        data = {};
+      }
       if (!res.ok) throw new Error(data.error || 'Failed to delete comment');
       if (typeof window !== 'undefined' && typeof (window as any).refreshSidebar === 'function') {
         (window as any).refreshSidebar();

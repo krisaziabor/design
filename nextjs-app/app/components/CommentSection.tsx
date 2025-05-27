@@ -37,7 +37,12 @@ export default function CommentSection({ comments, id, elementId, onCommentDelet
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ elementId, commentKey }),
       });
-      const data = await res.json();
+      let data;
+      try {
+        data = await res.json();
+      } catch {
+        data = {};
+      }
       if (!res.ok) throw new Error(data.error || 'Failed to delete comment');
       if (typeof window !== 'undefined' && typeof (window as any).refreshSidebar === 'function') {
         (window as any).refreshSidebar();
