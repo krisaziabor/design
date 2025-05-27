@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { formatCommentDate } from "@/app/client-utils";
+import { useUser } from '@clerk/nextjs';
 
 interface Comment {
   _key: string;
@@ -11,6 +12,7 @@ interface Comment {
 }
 
 export default function CommentSection({ comments, id, elementId, onCommentDeleted }: { comments: Comment[], id?: string, elementId: string, onCommentDeleted?: () => void }) {
+  const { isSignedIn } = useUser();
   const [deleting, setDeleting] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [confirmKey, setConfirmKey] = useState<string | null>(null);
@@ -75,20 +77,22 @@ export default function CommentSection({ comments, id, elementId, onCommentDelet
           <div key={comment._key || comment.dateAdded} className="flex flex-col text-sm">
             <div className="flex items-center justify-between mb-1">
               <span className="text-gray-400">{formatCommentDate(comment.dateAdded)}</span>
-              <button
-                className="ml-2 text-gray-400 hover:text-red-500 focus:outline-none"
-                title="Delete comment"
-                onClick={() => openConfirm(comment._key)}
-                disabled={deleting === comment._key}
-                aria-label="Delete comment"
-                type="button"
-              >
-                {deleting === comment._key ? (
-                  <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" /></svg>
-                ) : (
-                  <svg className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M10 8.586l4.95-4.95a1 1 0 111.414 1.414L11.414 10l4.95 4.95a1 1 0 01-1.414 1.414L10 11.414l-4.95 4.95a1 1 0 01-1.414-1.414L8.586 10l-4.95-4.95A1 1 0 115.05 3.636L10 8.586z" clipRule="evenodd" /></svg>
-                )}
-              </button>
+              {isSignedIn && (
+                <button
+                  className="ml-2 text-gray-400 hover:text-red-500 focus:outline-none"
+                  title="Delete comment"
+                  onClick={() => openConfirm(comment._key)}
+                  disabled={deleting === comment._key}
+                  aria-label="Delete comment"
+                  type="button"
+                >
+                  {deleting === comment._key ? (
+                    <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" /></svg>
+                  ) : (
+                    <svg className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M10 8.586l4.95-4.95a1 1 0 111.414 1.414L11.414 10l4.95 4.95a1 1 0 01-1.414 1.414L10 11.414l-4.95 4.95a1 1 0 01-1.414-1.414L8.586 10l-4.95-4.95A1 1 0 115.05 3.636L10 8.586z" clipRule="evenodd" /></svg>
+                  )}
+                </button>
+              )}
             </div>
             <span className="text-black">{comment.text}</span>
             {/* Confirmation Modal */}

@@ -3,6 +3,7 @@
 import React, { useEffect, useState, Suspense } from 'react';
 
 import Sidebar from '@/app/components/Sidebar';
+import { CustomSignIn } from './components/Sidebar';
 
 import { createClient } from 'next-sanity';
 import { apiVersion, dataset, projectId } from '@/sanity/lib/api';
@@ -213,11 +214,7 @@ function PageContent() {
                 </div>
               </div>
             ) : (
-              <div
-                className="w-2/5 text-sm text-black font-normal font-[family-name:var(--font-albragrotesk)]"
-              >
-                Sign in coming soon.
-              </div>
+              <CustomSignIn />
             )
           ) : loading ? (
             <div className="text-center text-gray-400"></div>

@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useSignIn, useUser, SignOutButton } from '@clerk/nextjs';
 
 import { clientPublic } from '@/sanity/lib/client-public';
 
@@ -50,6 +51,129 @@ name,
 }
 
 `;
+
+export function CustomSignIn() {
+  const [emailSent, setEmailSent] = useState(false);
+  const [code, setCode] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const { signIn, setActive } = useSignIn();
+  const { isSignedIn } = useUser();
+
+  if (isSignedIn) {
+    return (
+      <div className="flex flex-col gap-2 p-4 items-start">
+        <div className="text-sm font-normal mb-1 text-left">You are currently signed in.</div>
+        <SignOutButton>
+          <button className="text-blue-600 underline text-sm text-left">Log out</button>
+        </SignOutButton>
+      </div>
+    );
+  }
+
+  async function sendEmailCode() {
+    setLoading(true);
+    setError('');
+    if (!signIn) {
+      setError('Sign in not ready. Please try again.');
+      setLoading(false);
+      return;
+    }
+    try {
+      await signIn.create({ identifier: 'studio@krisaziabor.com', strategy: 'email_code' });
+      setEmailSent(true);
+    } catch (err: any) {
+      setError(err.errors?.[0]?.message || err.message || 'Failed to send code');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function resendEmailCode() {
+    setLoading(true);
+    setError('');
+    if (!signIn) {
+      setError('Sign in not ready. Please try again.');
+      setLoading(false);
+      return;
+    }
+    try {
+      await signIn.create({ identifier: 'studio@krisaziabor.com', strategy: 'email_code' });
+    } catch (err: any) {
+      setError(err.errors?.[0]?.message || err.message || 'Failed to resend code');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function submitCode() {
+    setLoading(true);
+    setError('');
+    if (!signIn) {
+      setError('Sign in not ready. Please try again.');
+      setLoading(false);
+      return;
+    }
+    try {
+      const result = await signIn.attemptFirstFactor({ strategy: 'email_code', code });
+      if (result.status === 'complete') {
+        await setActive({ session: result.createdSessionId });
+        setEmailSent(false);
+        setCode('');
+      } else {
+        setError('Invalid code or not complete.');
+      }
+    } catch (err: any) {
+      setError(err.errors?.[0]?.message || err.message || 'Failed to verify code');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <div className="flex flex-col gap-4 p-4">
+      <div className="text-lg font-semibold mb-2">Sign in</div>
+      {!emailSent ? (
+        <button
+          className="text-blue-600 font-semibold py-2 px-4 rounded bg-gray-100 hover:bg-blue-50 disabled:opacity-50"
+          onClick={sendEmailCode}
+          disabled={loading}
+        >
+          {loading ? 'Sending...' : 'Send email code'}
+        </button>
+      ) : (
+        <>
+          <input
+            type="text"
+            className="border rounded px-2 py-1 text-sm mb-2"
+            placeholder="Enter code"
+            value={code}
+            onChange={e => setCode(e.target.value)}
+            disabled={loading}
+          />
+          <div className="flex gap-2 mb-2">
+            <button
+              className="text-blue-600 underline text-sm"
+              onClick={resendEmailCode}
+              disabled={loading}
+            >
+              Resend
+            </button>
+            <button
+              className="text-blue-600 font-semibold py-1 px-3 rounded bg-gray-100 hover:bg-blue-50 text-sm"
+              onClick={submitCode}
+              disabled={loading || !code}
+            >
+              {loading ? 'Verifying...' : 'Enter'}
+            </button>
+          </div>
+        </>
+      )}
+      {error && <div className="text-red-500 text-xs mt-1">{error}</div>}
+      <div className="text-xs text-gray-500 mt-2">Sign in with studio@krisaziabor.com</div>
+    </div>
+  );
+}
 
 export default function Sidebar({
   onSelect,
@@ -107,6 +231,8 @@ export default function Sidebar({
 
   const [totalElements, setTotalElements] = useState<number>(0);
 
+  const router = useRouter();
+
   const infoMode = typeof infoModeProp === 'boolean' ? infoModeProp : infoModeInternal;
 
   const setInfoMode = setInfoModeProp || setInfoModeInternal;
@@ -114,8 +240,6 @@ export default function Sidebar({
   const infoTab = infoTabProp || infoTabInternal;
 
   const setInfoTab = setInfoTabProp || setInfoTabInternal;
-
-  const router = useRouter();
 
   useEffect(() => {
     if (selectedProp && (selectedProp.type !== selected.type || selectedProp.id !== selected.id)) {
