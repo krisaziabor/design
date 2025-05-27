@@ -1,8 +1,8 @@
-import Link from "next/link";
+import Link from 'next/link';
 
 export default function Header() {
   return (
-    <header className="fixed z-50 h-24 inset-0 bg-white/80 flex items-center backdrop-blur-lg">
+    <header className="fixed z-50 h-24 inset-0 bg-black/80 flex items-center backdrop-blur-lg">
       <div className="container py-6 sm:px-6">
         <div className="flex items-center justify-between gap-5">
           <Link className="flex items-center gap-2" href="/">
@@ -13,39 +13,46 @@ export default function Header() {
               className="text-red-500 h-7 sm:h-10 rounded-full"
             >
               <title>Sanity</title>
+
               <g clipPath="url(#clip0_1_821)">
                 <rect width="128" height="128" fill="currentColor" />
+
                 <path
                   d="M39.4229 33.1629C39.4229 44.1614 46.3362 50.7055 60.1767 54.1563L74.8429 57.4971C87.9417 60.453 95.9185 67.7945 95.9185 79.7554C96.0204 84.9662 94.296 90.053 91.0345 94.1634C91.0345 82.23 84.751 75.7822 69.595 71.9052L55.1947 68.6881C43.6633 66.1035 34.7628 60.068 34.7628 47.076C34.7021 42.0589 36.3415 37.1644 39.4229 33.1629"
                   fill="white"
                 />
+
                 <path
                   d="M82.0221 76.827C88.2776 80.759 91.0206 86.2583 91.0206 94.1497C85.8426 100.666 76.7462 104.323 66.0545 104.323C48.0576 104.323 35.4626 95.6207 32.6637 80.4978H49.9468C52.172 87.4406 58.0636 90.6577 65.9285 90.6577C75.5287 90.6577 81.9102 85.6258 82.0361 76.7995"
                   fill="#F9B1AB"
                 />
+
                 <path
                   d="M48.4074 49.4682C45.5509 47.8004 43.2073 45.404 41.6255 42.5332C40.0437 39.6624 39.2825 36.4244 39.423 33.1629C44.419 26.7013 53.1095 22.7556 63.7033 22.7556C82.0361 22.7556 92.6439 32.2693 95.2608 45.66H78.6354C76.8021 40.3807 72.212 36.27 63.8433 36.27C54.9008 36.27 48.7992 41.3843 48.4494 49.4682"
                   fill="#F9B1AB"
                 />
               </g>
+
               <defs>
                 <clipPath id="clip0_1_821">
                   <rect width="128" height="128" fill="white" />
                 </clipPath>
               </defs>
             </svg>
+
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 24 24"
               fill="currentColor"
-              className="text-black/70 h-5"
+              className="text-foreground/70 h-5"
             >
               <path d="M11 11V5H13V11H19V13H13V19H11V13H5V11H11Z"></path>
             </svg>
+
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 256 256"
-              className="text-[#000] h-7 sm:h-10"
+              className="text-foreground h-7 sm:h-10"
               fill="currentColor"
             >
               <g>
@@ -55,9 +62,8 @@ export default function Header() {
                 ></path>
               </g>
             </svg>
-            <span className="hidden lg:block text-lg pl-2 font-semibold">
-              Sanity + Next.js
-            </span>
+
+            <span className="hidden lg:block text-lg pl-2 font-semibold">Sanity + Next.js</span>
           </Link>
 
           <nav className="">
@@ -79,6 +85,7 @@ export default function Header() {
                   rel="noopener noreferrer"
                 >
                   <span className="sr-only sm:not-sr-only">View on GitHub</span>
+
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     viewBox="0 0 24 24"

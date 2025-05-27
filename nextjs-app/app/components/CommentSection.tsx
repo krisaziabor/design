@@ -15,6 +15,13 @@ export default function CommentSection({ comments, id }: { comments: Comment[], 
     ? comments.filter((comment) => comment && typeof comment.text === 'string')
     : [];
 
+  // Sort comments by dateAdded descending (most recent first)
+  const sortedComments = [...validComments].sort((a, b) => {
+    const dateA = new Date(a.dateAdded).getTime();
+    const dateB = new Date(b.dateAdded).getTime();
+    return dateB - dateA;
+  });
+
   if (validComments.length === 0) {
     return (
       <div id={id} className="w-full max-w-4xl mx-auto border-t border-gray-200 mt-8 pt-8 text-sm">
@@ -28,7 +35,7 @@ export default function CommentSection({ comments, id }: { comments: Comment[], 
     <div id={id} className="w-full max-w-4xl mx-auto border-t border-gray-200 mt-8 pt-8 text-sm">
       <div className="mb-4 font-semibold">All comments</div>
       <div className="grid gap-6 grid-cols-1 md:grid-cols-3">
-        {validComments.map((comment) => (
+        {sortedComments.map((comment) => (
           <div key={comment._key || comment.dateAdded} className="flex flex-col text-sm">
             <span className="text-gray-400 mb-1">{formatCommentDate(comment.dateAdded)}</span>
             <span className="text-black">{comment.text}</span>
