@@ -231,6 +231,8 @@ export default function Sidebar({
 
   const [totalElements, setTotalElements] = useState<number>(0);
 
+  const [searchValue, setSearchValue] = useState('');
+
   const router = useRouter();
 
   const infoMode = typeof infoModeProp === 'boolean' ? infoModeProp : infoModeInternal;
@@ -433,14 +435,46 @@ export default function Sidebar({
               </button>
             </div>
 
-            {/* Group 3: Search label */}
-
-            <div className="w-full">
-              <span
-                className="text-sm text-foreground font-[family-name:var(--font-albragrotesk)]"
+            {/* Group 3: Search input with help icon */}
+            <div className="w-full relative flex items-center">
+              <form
+                onSubmit={e => {
+                  e.preventDefault();
+                  if (searchValue.trim()) {
+                    router.push(`/search?q=${encodeURIComponent(searchValue.trim())}`);
+                  }
+                }}
+                className="flex-1"
               >
-                Search
-              </span>
+                <input
+                  type="text"
+                  value={searchValue}
+                  onChange={e => setSearchValue(e.target.value)}
+                  placeholder="Search..."
+                  className="w-full text-sm text-foreground font-[family-name:var(--font-albragrotesk)] focus:outline-none bg-transparent border-none p-0 m-0 shadow-none"
+                  aria-label="Search library"
+                  style={{ boxShadow: 'none', background: 'none', border: 'none' }}
+                />
+              </form>
+              {/* Help icon */}
+              <div className="relative ml-2 group flex-shrink-0">
+                <button
+                  type="button"
+                  tabIndex={0}
+                  aria-label="Search help"
+                  className="text-gray-400 hover:text-black dark:hover:text-white focus:outline-none"
+                  style={{ background: 'none', border: 'none', padding: 0, margin: 0, cursor: 'pointer' }}
+                >
+                  <svg width="18" height="18" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="10" cy="10" r="9" stroke="currentColor" strokeWidth="1.5" fill="none" />
+                    <text x="10" y="15" textAnchor="middle" fontSize="13" fill="currentColor" fontFamily="inherit">?</text>
+                  </svg>
+                </button>
+                {/* Tooltip/modal */}
+                <div className="absolute right-auto left-2 top-7 z-50 w-64 bg-white dark:bg-black border border-gray-200 dark:border-gray-700 rounded shadow-lg px-4 py-3 text-xs text-black dark:text-white font-[family-name:var(--font-albragrotesk)] opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 pointer-events-none group-hover:pointer-events-auto group-focus-within:pointer-events-auto transition-opacity duration-150" role="tooltip">
+                  Use <span className="font-mono bg-gray-100 dark:bg-gray-800 px-1 rounded">proj:</span> and <span className="font-mono bg-gray-100 dark:bg-gray-800 px-1 rounded">comm:</span> to filter for either connected projects or comments (or both together)
+                </div>
+              </div>
             </div>
           </>
         )}
