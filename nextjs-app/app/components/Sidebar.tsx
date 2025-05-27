@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
 import { clientPublic } from '@/sanity/lib/client-public';
 
@@ -62,10 +63,12 @@ export default function Sidebar({
   infoTab: infoTabProp,
 
   setInfoTab: setInfoTabProp,
-}: {
-  onSelect: (filter: { type: 'all' | 'category' | 'subcategory'; id?: string }) => void;
 
-  selected?: { type: 'all' | 'category' | 'subcategory'; id?: string };
+  initialView,
+}: {
+  onSelect: (filter: { type: 'all' | 'category' | 'subcategory' | 'project'; id?: string }) => void;
+
+  selected?: { type: 'all' | 'category' | 'subcategory' | 'project'; id?: string };
 
   infoMode?: boolean;
 
@@ -74,10 +77,12 @@ export default function Sidebar({
   infoTab?: 'information' | 'colophon' | 'login';
 
   setInfoTab?: (v: 'information' | 'colophon' | 'login') => void;
+
+  initialView?: 'tags' | 'projects';
 }) {
   // State for toggling between Tags and Projects
 
-  const [view, setView] = useState<'tags' | 'projects'>('tags');
+  const [view, setView] = useState<'tags' | 'projects'>(initialView || 'tags');
 
   const [categories, setCategories] = useState<any[]>([]);
 
@@ -90,7 +95,7 @@ export default function Sidebar({
   const [openCategory, setOpenCategory] = useState<string | null>(null);
 
   const [selected, setSelected] = useState<{
-    type: 'all' | 'category' | 'subcategory';
+    type: 'all' | 'category' | 'subcategory' | 'project';
     id?: string;
   }>(selectedProp || { type: 'all' });
 
@@ -100,6 +105,8 @@ export default function Sidebar({
     'information'
   );
 
+  const [totalElements, setTotalElements] = useState<number>(0);
+
   const infoMode = typeof infoModeProp === 'boolean' ? infoModeProp : infoModeInternal;
 
   const setInfoMode = setInfoModeProp || setInfoModeInternal;
@@ -107,6 +114,8 @@ export default function Sidebar({
   const infoTab = infoTabProp || infoTabInternal;
 
   const setInfoTab = setInfoTabProp || setInfoTabInternal;
+
+  const router = useRouter();
 
   useEffect(() => {
     if (selectedProp && (selectedProp.type !== selected.type || selectedProp.id !== selected.id)) {
@@ -132,14 +141,16 @@ export default function Sidebar({
   useEffect(() => {
     async function fetchData() {
       setLoading(true);
-      const [cats, subs, projs] = await Promise.all([
+      const [cats, subs, projs, allCount] = await Promise.all([
         clientPublic.fetch(categoriesWithCountQuery),
         clientPublic.fetch(subcategoriesWithCountQuery),
         clientPublic.fetch(projectsWithCountQuery),
+        clientPublic.fetch("count(*[_type == 'elements'])"),
       ]);
       setCategories(cats || []);
       setSubcategories(subs || []);
       setProjects(projs || []);
+      setTotalElements(allCount || 0);
       setLoading(false);
     }
     fetchData();
@@ -149,10 +160,7 @@ export default function Sidebar({
 
   // Calculate total inspirations for 'All'
 
-  const allCount =
-    view === 'tags'
-      ? categories.reduce((sum, c) => sum + (c.count || 0), 0)
-      : projects.reduce((sum, p) => sum + (p.count || 0), 0);
+  const allCount = totalElements;
 
   // Sort categories and projects alphabetically by name
 
@@ -195,6 +203,12 @@ export default function Sidebar({
     setOpenCategory(parentId); // keep parent open
 
     onSelect({ type: 'subcategory', id: subId });
+  }
+
+  function handleSelectProject(projId: string) {
+    setSelected({ type: 'project', id: projId });
+    router.push(`/projects/${projId}`);
+    onSelect({ type: 'project', id: projId });
   }
 
   // Helper for color classes
@@ -313,66 +327,68 @@ export default function Sidebar({
             {loading ? (
               <span className="text-xs text-gray-400">Loading...</span>
             ) : view === 'tags' ? (
-              sortedCategories.map((cat) => (
-                <React.Fragment key={cat._id}>
-                  <div
-                    className="flex items-center w-full justify-between cursor-pointer"
-                    onClick={() => handleSelectCategory(cat._id)}
-                  >
-                    <span
-                      className={getSidebarItemClass(
-                        (selected.type === 'category' && selected.id === cat._id) ||
-                          (selected.type === 'subcategory' && openCategory === cat._id)
-                      )}
-                      style={{ fontFamily: 'var(--font-albragrotesk)' }}
+              sortedCategories.map((cat) => {
+                const isDisabled = cat.count === 0;
+                return (
+                  <React.Fragment key={cat._id}>
+                    <div
+                      className={`flex items-center w-full justify-between ${isDisabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+                      onClick={isDisabled ? undefined : () => handleSelectCategory(cat._id)}
                     >
-                      {cat.name}
-                    </span>
-
-                    <span
-                      className={getSidebarItemClass(
-                        (selected.type === 'category' && selected.id === cat._id) ||
-                          (selected.type === 'subcategory' && openCategory === cat._id)
-                      )}
-                      style={{ fontFamily: 'var(--font-albragrotesk)' }}
-                    >
-                      {cat.count}
-                    </span>
-                  </div>
-
-                  {/* Subcategories, if this category is open */}
-
-                  {openCategory === cat._id && subcategoriesByParent[cat._id] && (
-                    <div className="ml-4 flex flex-col gap-1">
-                      {subcategoriesByParent[cat._id].map((sub) => (
-                        <div
-                          key={sub._id}
-                          className="flex items-center w-full justify-between cursor-pointer"
-                          onClick={() => handleSelectSubcategory(sub._id, cat._id)}
-                        >
-                          <span
-                            className={getSidebarSubItemClass(
-                              selected.type === 'subcategory' && selected.id === sub._id
-                            )}
-                            style={{ fontFamily: 'var(--font-albragrotesk)' }}
-                          >
-                            {sub.name}
-                          </span>
-
-                          <span
-                            className={getSidebarSubItemClass(
-                              selected.type === 'subcategory' && selected.id === sub._id
-                            )}
-                            style={{ fontFamily: 'var(--font-albragrotesk)' }}
-                          >
-                            {sub.count}
-                          </span>
-                        </div>
-                      ))}
+                      <span
+                        className={getSidebarItemClass(
+                          (selected.type === 'category' && selected.id === cat._id) ||
+                            (selected.type === 'subcategory' && openCategory === cat._id)
+                        )}
+                        style={{ fontFamily: 'var(--font-albragrotesk)' }}
+                      >
+                        {cat.name}
+                      </span>
+                      <span
+                        className={getSidebarItemClass(
+                          (selected.type === 'category' && selected.id === cat._id) ||
+                            (selected.type === 'subcategory' && openCategory === cat._id)
+                        )}
+                        style={{ fontFamily: 'var(--font-albragrotesk)' }}
+                      >
+                        {cat.count}
+                      </span>
                     </div>
-                  )}
-                </React.Fragment>
-              ))
+                    {/* Subcategories, if this category is open */}
+                    {openCategory === cat._id && subcategoriesByParent[cat._id] && (
+                      <div className="ml-4 flex flex-col gap-1">
+                        {subcategoriesByParent[cat._id].map((sub) => {
+                          const isSubDisabled = sub.count === 0;
+                          return (
+                            <div
+                              key={sub._id}
+                              className={`flex items-center w-full justify-between ${isSubDisabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+                              onClick={isSubDisabled ? undefined : () => handleSelectSubcategory(sub._id, cat._id)}
+                            >
+                              <span
+                                className={getSidebarSubItemClass(
+                                  selected.type === 'subcategory' && selected.id === sub._id
+                                )}
+                                style={{ fontFamily: 'var(--font-albragrotesk)' }}
+                              >
+                                {sub.name}
+                              </span>
+                              <span
+                                className={getSidebarSubItemClass(
+                                  selected.type === 'subcategory' && selected.id === sub._id
+                                )}
+                                style={{ fontFamily: 'var(--font-albragrotesk)' }}
+                              >
+                                {sub.count}
+                              </span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </React.Fragment>
+                );
+              })
             ) : (
               <>
                 <div
@@ -383,23 +399,23 @@ export default function Sidebar({
                   elements, toggle the Tags view instead.
                 </div>
 
-                {sortedProjects.map((proj) => (
-                  <div key={proj._id} className="flex items-center w-full justify-between">
-                    <span
-                      className="text-sm text-foreground"
-                      style={{ fontFamily: 'var(--font-albragrotesk)' }}
+                {sortedProjects.map((proj) => {
+                  const isDisabled = proj.count === 0;
+                  return (
+                    <div
+                      key={proj._id}
+                      className={`flex items-center w-full justify-between ${isDisabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+                      onClick={isDisabled ? undefined : () => handleSelectProject(proj._id)}
                     >
-                      {proj.name}
-                    </span>
-
-                    <span
-                      className="text-sm text-foreground"
-                      style={{ fontFamily: 'var(--font-albragrotesk)' }}
-                    >
-                      {proj.count}
-                    </span>
-                  </div>
-                ))}
+                      <span
+                        className="text-sm text-foreground"
+                        style={{ fontFamily: 'var(--font-albragrotesk)' }}
+                      >
+                        {proj.name}
+                      </span>
+                    </div>
+                  );
+                })}
               </>
             )}
           </div>

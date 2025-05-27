@@ -26,6 +26,10 @@ export default function ActionSidebar({ element, loading, onCommentAdded }: Acti
   const [projectLoading, setProjectLoading] = useState(false);
   const [projectError, setProjectError] = useState('');
 
+  const [deleting, setDeleting] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+
   const router = useRouter();
 
   React.useEffect(() => {
@@ -135,6 +139,30 @@ export default function ActionSidebar({ element, loading, onCommentAdded }: Acti
     }
   };
 
+  async function handleDeleteComment() {
+    if (!element?._id || !latestComment?._key) return;
+    setDeleting(true);
+    setDeleteError(null);
+    try {
+      const res = await fetch('/api/comments', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ elementId: element._id, commentKey: latestComment._key }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to delete comment');
+      if (typeof window !== 'undefined' && typeof (window as any).refreshSidebar === 'function') {
+        (window as any).refreshSidebar();
+      }
+      if (onCommentAdded) onCommentAdded();
+    } catch (err: any) {
+      setDeleteError(err.message || 'Failed to delete comment');
+    } finally {
+      setDeleting(false);
+      setConfirmDelete(false);
+    }
+  }
+
   return (
     <div className="w-64 min-h-screen bg-white dark:bg-black flex flex-col pt-8 pb-8 pl-8 pr-4">
       <div className="flex flex-col w-full h-full flex-1 justify-between">
@@ -242,20 +270,61 @@ export default function ActionSidebar({ element, loading, onCommentAdded }: Acti
           {loading ? (
             <div className="text-sm text-gray-400">Loading...</div>
           ) : latestComment ? (
-            <div className="mb-2">
-              <div
-                className="text-sm text-gray-400 mb-0.5"
-                style={{ fontFamily: 'var(--font-albragrotesk)' }}
-              >
-                {latestComment.dateAdded ? formatCommentDate(latestComment.dateAdded) : ''}
+            <div className="mb-2 relative">
+              <div className="flex items-center justify-between">
+                <div
+                  className="text-sm text-gray-400 mb-0.5"
+                  style={{ fontFamily: 'var(--font-albragrotesk)' }}
+                >
+                  {latestComment.dateAdded ? formatCommentDate(latestComment.dateAdded) : ''}
+                </div>
+                <button
+                  className="ml-2 text-gray-400 hover:text-red-500 focus:outline-none"
+                  title="Delete comment"
+                  onClick={() => setConfirmDelete(true)}
+                  disabled={deleting}
+                  aria-label="Delete comment"
+                  type="button"
+                >
+                  {deleting ? (
+                    <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" /></svg>
+                  ) : (
+                    <svg className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M10 8.586l4.95-4.95a1 1 0 111.414 1.414L11.414 10l4.95 4.95a1 1 0 01-1.414 1.414L10 11.414l-4.95 4.95a1 1 0 01-1.414-1.414L8.586 10l-4.95-4.95A1 1 0 115.05 3.636L10 8.586z" clipRule="evenodd" /></svg>
+                  )}
+                </button>
               </div>
-
+              {deleteError && <div className="text-xs text-red-500 mb-1">{deleteError}</div>}
               <div
                 className="text-sm text-black dark:text-white"
                 style={{ fontFamily: 'var(--font-albragrotesk)' }}
               >
                 {typeof latestComment.text === 'string' ? latestComment.text : ''}
               </div>
+              {/* Confirmation Modal */}
+              {confirmDelete && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+                  <div className="bg-white rounded shadow-lg p-6 max-w-sm w-full text-center">
+                    <div className="mb-4 text-lg font-semibold text-black">Delete this comment?</div>
+                    <div className="mb-6 text-gray-700">Are you sure you want to delete this comment? This action cannot be undone.</div>
+                    <div className="flex justify-center gap-4">
+                      <button
+                        className="px-4 py-2 rounded bg-gray-200 text-gray-800 hover:bg-gray-300 focus:outline-none"
+                        onClick={() => setConfirmDelete(false)}
+                        disabled={deleting}
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        className="px-4 py-2 rounded bg-red-500 text-white hover:bg-red-600 focus:outline-none"
+                        onClick={handleDeleteComment}
+                        disabled={deleting}
+                      >
+                        {deleting ? 'Deleting...' : 'Delete'}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           ) : (
             <div className="text-sm text-gray-400">No comments yet.</div>

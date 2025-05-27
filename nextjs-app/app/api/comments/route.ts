@@ -26,4 +26,21 @@ export async function POST(req: NextRequest) {
   } catch (err) {
     return NextResponse.json({ error: (err as Error).message }, { status: 500 });
   }
+}
+
+export async function DELETE(req: NextRequest) {
+  try {
+    const { elementId, commentKey } = await req.json();
+    if (!elementId || !commentKey) {
+      return NextResponse.json({ error: 'Missing elementId or commentKey' }, { status: 400 });
+    }
+    // Remove the comment with the given _key from the comments array
+    const result = await client
+      .patch(elementId)
+      .unset([`comments[_key=="${commentKey}"]`])
+      .commit();
+    return NextResponse.json({ result });
+  } catch (err) {
+    return NextResponse.json({ error: (err as Error).message }, { status: 500 });
+  }
 } 

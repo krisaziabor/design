@@ -27,17 +27,19 @@ function PageContent() {
   const [loading, setLoading] = useState(true);
 
   const [selectedFilter, setSelectedFilter] = useState<{
-    type: 'all' | 'category' | 'subcategory';
+    type: 'all' | 'category' | 'subcategory' | 'project';
     id?: string;
   }>(() => {
     const category = searchParams.get('category');
-
     const subcategory = searchParams.get('subcategory');
+    const project = searchParams.get('project');
 
     if (subcategory) {
       return { type: 'subcategory', id: subcategory };
     } else if (category) {
       return { type: 'category', id: category };
+    } else if (project) {
+      return { type: 'project', id: project };
     } else {
       return { type: 'all' };
     }
@@ -51,13 +53,15 @@ function PageContent() {
 
   React.useEffect(() => {
     const category = searchParams.get('category');
-
     const subcategory = searchParams.get('subcategory');
+    const project = searchParams.get('project');
 
     if (subcategory) {
       setSelectedFilter({ type: 'subcategory', id: subcategory });
     } else if (category) {
       setSelectedFilter({ type: 'category', id: category });
+    } else if (project) {
+      setSelectedFilter({ type: 'project', id: project });
     } else {
       setSelectedFilter({ type: 'all' });
     }
@@ -102,6 +106,12 @@ function PageContent() {
       (el: any) =>
         Array.isArray(el.subCategories) &&
         el.subCategories.some((sub: any) => sub?._ref === selectedFilter.id)
+    );
+  } else if (selectedFilter.type === 'project' && selectedFilter.id) {
+    filteredElements = elements.filter(
+      (el: any) =>
+        Array.isArray(el.connectedProjects) &&
+        el.connectedProjects.some((proj: any) => (proj?._id || proj?._ref) === selectedFilter.id)
     );
   }
 
@@ -215,11 +225,17 @@ function PageContent() {
           ) : loading ? (
             <div className="text-center text-gray-400"></div>
           ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 items-stretch">
-              {filteredElements.map((el: any) => (
-                <ElementThumbnail key={el._id} element={el} selectedFilter={selectedFilter} />
-              ))}
-            </div>
+            filteredElements.length === 0 && selectedFilter.type !== 'all' ? (
+              <div className="text-center text-gray-400" style={{ fontFamily: 'var(--font-albragrotesk)' }}>
+                No elements found for this {selectedFilter.type}.
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 items-stretch">
+                {filteredElements.map((el: any) => (
+                  <ElementThumbnail key={el._id} element={el} selectedFilter={selectedFilter} />
+                ))}
+              </div>
+            )
           )}
         </div>
       </main>

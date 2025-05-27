@@ -48,16 +48,18 @@ export default function ElementPageHandler() {
 
   // Determine selected filter from URL
 
-  let selectedFilter: { type: 'all' | 'category' | 'subcategory'; id?: string } = { type: 'all' };
+  let selectedFilter: { type: 'all' | 'category' | 'subcategory' | 'project'; id?: string } = { type: 'all' };
 
   const category = searchParams.get('category');
-
   const subcategory = searchParams.get('subcategory');
+  const project = searchParams.get('project');
 
   if (subcategory) {
     selectedFilter = { type: 'subcategory', id: subcategory };
   } else if (category) {
     selectedFilter = { type: 'category', id: category };
+  } else if (project) {
+    selectedFilter = { type: 'project', id: project };
   }
 
   const fetchElement = async () => {
@@ -110,13 +112,15 @@ export default function ElementPageHandler() {
 
   // Handler for sidebar navigation
 
-  function handleSidebarSelect(filter: { type: 'all' | 'category' | 'subcategory'; id?: string }) {
+  function handleSidebarSelect(filter: { type: 'all' | 'category' | 'subcategory' | 'project'; id?: string }) {
     if (filter.type === 'all') {
       router.push('/');
     } else if (filter.type === 'category' && filter.id) {
       router.push(`/?category=${filter.id}`);
     } else if (filter.type === 'subcategory' && filter.id) {
       router.push(`/?subcategory=${filter.id}`);
+    } else if (filter.type === 'project' && filter.id) {
+      router.push(`/?project=${filter.id}`);
     }
   }
 
@@ -125,7 +129,7 @@ export default function ElementPageHandler() {
       {/* Main Sidebar */}
 
       <div className="sticky top-0 h-screen z-10">
-        <Sidebar onSelect={handleSidebarSelect} selected={selectedFilter} />
+        <Sidebar onSelect={handleSidebarSelect} selected={selectedFilter} initialView={selectedFilter.type === 'project' ? 'projects' : 'tags'} />
       </div>
 
       {/* Action Sidebar */}
@@ -380,6 +384,8 @@ export default function ElementPageHandler() {
           <CommentSection
             comments={Array.isArray(element.comments) ? element.comments : []}
             id="comment-section"
+            elementId={element._id}
+            onCommentDeleted={fetchElement}
           />
         )}
 

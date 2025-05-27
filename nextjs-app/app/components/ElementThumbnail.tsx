@@ -33,7 +33,7 @@ function ElementThumbnail({
   selectedFilter,
 }: {
   element: any;
-  selectedFilter?: { type: 'all' | 'category' | 'subcategory'; id?: string };
+  selectedFilter?: { type: 'all' | 'category' | 'subcategory' | 'project'; id?: string };
 }) {
   const videoTypes = ['mov', 'mp4', 'gif'];
 
@@ -122,9 +122,11 @@ function ElementThumbnail({
   let href = `/elements/${element._id}`;
 
   if (selectedFilter && selectedFilter.type !== 'all' && selectedFilter.id) {
-    const param = selectedFilter.type === 'category' ? 'category' : 'subcategory';
-
-    href += `?${param}=${selectedFilter.id}`;
+    let param = '';
+    if (selectedFilter.type === 'category') param = 'category';
+    else if (selectedFilter.type === 'subcategory') param = 'subcategory';
+    else if (selectedFilter.type === 'project') param = 'project';
+    if (param) href += `?${param}=${selectedFilter.id}`;
   }
 
   // Set a container with no fixed height, but constrain the media to a max height and maintain aspect ratio
