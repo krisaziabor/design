@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useSignIn, useUser, SignOutButton } from '@clerk/nextjs';
 
 import { clientPublic } from '@/sanity/lib/client-public';
@@ -177,31 +177,19 @@ export function CustomSignIn() {
 
 export default function Sidebar({
   onSelect,
-
   selected: selectedProp,
-
   infoMode: infoModeProp,
-
   setInfoMode: setInfoModeProp,
-
   infoTab: infoTabProp,
-
   setInfoTab: setInfoTabProp,
-
   initialView,
 }: {
-  onSelect: (filter: { type: 'all' | 'category' | 'subcategory' | 'project'; id?: string }) => void;
-
+  onSelect: (filter: { type: 'all' | 'category' | 'subcategory' | 'project'; id?: string; parentCategoryId?: string }) => void;
   selected?: { type: 'all' | 'category' | 'subcategory' | 'project'; id?: string };
-
   infoMode?: boolean;
-
   setInfoMode?: (v: boolean) => void;
-
   infoTab?: 'information' | 'colophon' | 'login';
-
   setInfoTab?: (v: 'information' | 'colophon' | 'login') => void;
-
   initialView?: 'tags' | 'projects';
 }) {
   // State for toggling between Tags and Projects
@@ -234,6 +222,7 @@ export default function Sidebar({
   const [searchValue, setSearchValue] = useState('');
 
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   const infoMode = typeof infoModeProp === 'boolean' ? infoModeProp : infoModeInternal;
 
@@ -263,6 +252,14 @@ export default function Sidebar({
       }
     }
   }, [selectedProp, selected.id, selected.type, subcategories]);
+
+  // Set openCategory from URL on mount
+  useEffect(() => {
+    const openCategoryParam = searchParams.get('openCategory');
+    if (openCategoryParam) {
+      setOpenCategory(openCategoryParam);
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     async function fetchData() {
@@ -326,18 +323,14 @@ export default function Sidebar({
 
   function handleSelectCategory(catId: string) {
     setSelected({ type: 'category', id: catId });
-
     setOpenCategory(openCategory === catId ? null : catId);
-
     onSelect({ type: 'category', id: catId });
   }
 
   function handleSelectSubcategory(subId: string, parentId: string) {
     setSelected({ type: 'subcategory', id: subId });
-
     setOpenCategory(parentId); // keep parent open
-
-    onSelect({ type: 'subcategory', id: subId });
+    onSelect({ type: 'subcategory', id: subId, parentCategoryId: parentId });
   }
 
   function handleSelectProject(projId: string) {

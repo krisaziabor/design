@@ -22,6 +22,8 @@ import ElementThumbnail from '@/app/components/ElementThumbnail';
 
 import cleanUrl from '@/app/components/cleanUrl';
 
+import handleSidebarSelect, { SidebarFilter } from '@/app/components/HandleSidebarSelect';
+
 // Create a no-CDN client for fresh fetches after mutations
 const clientNoCdn = createClient({
   projectId,
@@ -112,16 +114,8 @@ export default function ElementPageHandler() {
 
   // Handler for sidebar navigation
 
-  function handleSidebarSelect(filter: { type: 'all' | 'category' | 'subcategory' | 'project'; id?: string }) {
-    if (filter.type === 'all') {
-      router.push('/');
-    } else if (filter.type === 'category' && filter.id) {
-      router.push(`/?category=${filter.id}`);
-    } else if (filter.type === 'subcategory' && filter.id) {
-      router.push(`/?subcategory=${filter.id}`);
-    } else if (filter.type === 'project' && filter.id) {
-      router.push(`/?project=${filter.id}`);
-    }
+  function onSidebarSelect(filter: SidebarFilter) {
+    handleSidebarSelect(filter, router);
   }
 
   return (
@@ -129,7 +123,7 @@ export default function ElementPageHandler() {
       {/* Main Sidebar */}
 
       <div className="sticky top-0 h-screen z-10">
-        <Sidebar onSelect={handleSidebarSelect} selected={selectedFilter} initialView={selectedFilter.type === 'project' ? 'projects' : 'tags'} />
+        <Sidebar onSelect={onSidebarSelect} selected={selectedFilter} initialView={selectedFilter.type === 'project' ? 'projects' : 'tags'} />
       </div>
 
       {/* Action Sidebar */}
@@ -140,7 +134,7 @@ export default function ElementPageHandler() {
 
       <main className="flex-1 flex flex-col items-center px-4 py-8 overflow-y-auto max-h-screen text-black dark:text-white">
         {loading ? (
-          <div className="text-center text-gray-400">Loading...</div>
+          <div className="text-center text-gray-700 font-[family-name:var(--font-albragrotesk)]">One moment...</div>
         ) : element ? (
           <div className="w-full max-w-4xl flex flex-col items-center text-black dark:text-white">
             {/* Video display logic for mov/mp4/gif */}

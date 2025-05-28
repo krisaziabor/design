@@ -1,15 +1,25 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
-import { useSearchParams } from 'next/navigation';
+import React, { useEffect, useState, Suspense } from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
 import Sidebar from '@/app/components/Sidebar';
 import ElementThumbnail from '@/app/components/ElementThumbnail';
+import handleSidebarSelect, { SidebarFilter } from '@/app/components/HandleSidebarSelect';
 
-export default function SearchPage() {
+function SearchPageContent() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const q = searchParams.get('q') || '';
   const [results, setResults] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
+
+  // Define selectedFilter (default to 'all', or enhance as needed)
+  const selectedFilter: SidebarFilter = { type: 'all' };
+
+  // Wrapper for Sidebar
+  function onSidebarSelect(filter: SidebarFilter) {
+    handleSidebarSelect(filter, router);
+  }
 
   useEffect(() => {
     if (!q) return;
@@ -24,7 +34,7 @@ export default function SearchPage() {
     <div className="min-h-screen flex flex-row bg-white dark:bg-black">
       {/* Sidebar */}
       <div className="sticky top-0 h-screen z-10">
-        <Sidebar />
+        <Sidebar onSelect={onSidebarSelect} selected={selectedFilter} initialView="tags" />
       </div>
       {/* Main Content */}
       <main className="flex-1 flex flex-col items-center px-4 py-8 overflow-y-auto max-h-screen text-black dark:text-white">
@@ -32,10 +42,10 @@ export default function SearchPage() {
           <div className="font-[family-name:var(--font-albragrotesk)] text-sm mb-2">
             {q ? (
               loading ? (
-                <>Searching for <span className="font-semibold">"{q}"</span>...</>
+                <>Searching for <span className="font-semibold">&quot;{q}&quot;</span>...</>
               ) : (
                 <>
-                  {results.length} result{results.length === 1 ? '' : 's'} for <span className="font-semibold">"{q}"</span>
+                  {results.length} result{results.length === 1 ? '' : 's'} for <span className="font-semibold">&apos;{q}&apos;</span>
                 </>
               )
             ) : (
@@ -58,5 +68,13 @@ export default function SearchPage() {
         </div>
       </main>
     </div>
+  );
+}
+
+export default function SearchPage() {
+  return (
+    <Suspense fallback={<div className="p-8 text-center text-gray-400">Loading search...</div>}>
+      <SearchPageContent />
+    </Suspense>
   );
 } 
