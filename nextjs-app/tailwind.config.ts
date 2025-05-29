@@ -15,6 +15,10 @@ export default {
       colors: {
         black: "#0d0e12",
         white: "#fff",
+        'default-light': '#808080', // light grey
+        'selected-light': '#000000', // black
+        'default-dark': '#23272e',   // moderately dark grey
+        'selected-dark': '#ffffff',  // white
         cyan: {
           50: "#e7fefe",
           100: "#c5fcfc",

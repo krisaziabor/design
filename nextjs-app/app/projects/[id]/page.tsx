@@ -78,11 +78,6 @@ export default function ProjectPage() {
       </div>
       {/* Main Content */}
       <main className="flex-1 flex flex-col items-center px-4 py-8 overflow-y-auto max-h-screen text-black dark:text-white">
-        {projectDescription && (
-          <div className="mb-6 w-full max-w-6xl text-sm text-gray-700 dark:text-gray-200 font-[family-name:var(--font-albragrotesk)]">
-            {projectDescription}
-          </div>
-        )}
         {loading ? (
           <div className="text-center text-gray-700 font-[family-name:var(--font-albragrotesk)]">One sec...</div>
         ) : !projectExists ? (

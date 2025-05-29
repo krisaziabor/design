@@ -3,7 +3,7 @@
 import React, { useEffect, useState, Suspense } from 'react';
 
 import Sidebar from '@/app/components/Sidebar';
-import { CustomSignIn } from './components/Sidebar';
+
 
 import { createClient } from 'next-sanity';
 import { apiVersion, dataset, projectId } from '@/sanity/lib/api';
@@ -45,10 +45,6 @@ function PageContent() {
       return { type: 'all' };
     }
   });
-
-  const [infoMode, setInfoMode] = useState(false);
-
-  const [infoTab, setInfoTab] = useState<'information' | 'colophon' | 'login'>('information');
 
   // Keep selectedFilter in sync with URL params
 
@@ -124,10 +120,6 @@ function PageContent() {
         <Sidebar
           onSelect={setSelectedFilter}
           selected={selectedFilter}
-          infoMode={infoMode}
-          setInfoMode={setInfoMode}
-          infoTab={infoTab}
-          setInfoTab={setInfoTab}
         />
       </div>
 
@@ -135,88 +127,7 @@ function PageContent() {
 
       <main className="flex-1 flex flex-col items-center px-4 py-8 overflow-y-auto max-h-screen text-black dark:text-white">
         <div className="w-full max-w-6xl flex flex-col gap-8">
-          {infoMode ? (
-            infoTab === 'information' ? (
-              <div
-                className="w-2/5 text-sm text-black font-normal whitespace-pre-line font-[family-name:var(--font-albragrotesk)]"
-              >
-                {`The Design Library is the first of several library projects I intend on creating this summer.\n\nScouring the internet for the best websites, brand guidelines, and graphics is my favorite form of procrastination, and I wanted to share this tradition with the web. \n\nThe KAKA Literary Library & Photographers Library are both on the way.\n\nSummer 2025`}
-              </div>
-            ) : infoTab === 'colophon' ? (
-              <div
-                className="w-2/5 text-sm text-black font-normal space-y-2 font-[family-name:var(--font-albragrotesk)]"
-              >
-                <div>
-                  Typography &rarr; Albra Grotesk by{' '}
-                  <a
-                    href="https://ultra-kuhl.com/en/albra"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="underline hover:text-black text-gray-700"
-                  >
-                    Ultra Kuhl Type Foundry
-                  </a>
-                </div>
-
-                <div>
-                  CMS &rarr;{' '}
-                  <a
-                    href="https://www.sanity.io/"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="underline hover:text-black text-gray-700"
-                  >
-                    Sanity
-                  </a>
-                </div>
-
-                <div>
-                  Local software &rarr;{' '}
-                  <a
-                    href="https://eagle.cool/"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="underline hover:text-black text-gray-700"
-                  >
-                    Eagle
-                  </a>
-                </div>
-
-                <div>
-                  Inspiration &rarr;{' '}
-                  <a
-                    href="https://archive.saman.design/"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="underline hover:text-black text-gray-700"
-                  >
-                    Saman Archive
-                  </a>
-                  ,{' '}
-                  <a
-                    href="https://www.chris-wang.com/collection"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="underline hover:text-black text-gray-700"
-                  >
-                    Chris Wang Collection
-                  </a>
-                </div>
-
-                <div>
-                  Contact &rarr;{' '}
-                  <a
-                    href="mailto:kris@krisaziabor.com"
-                    className="underline hover:text-black text-gray-700"
-                  >
-                    kris@krisaziabor.com
-                  </a>
-                </div>
-              </div>
-            ) : (
-              <CustomSignIn />
-            )
-          ) : loading ? (
+          {loading ? (
             <div className="text-center text-gray-400"></div>
           ) : (
             filteredElements.length === 0 && selectedFilter.type !== 'all' ? (

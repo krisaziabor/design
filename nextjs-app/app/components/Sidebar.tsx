@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useSignIn, useUser, SignOutButton } from '@clerk/nextjs';
+import Link from 'next/link';
 
 import { clientPublic } from '@/sanity/lib/client-public';
 
@@ -52,144 +52,13 @@ name,
 
 `;
 
-export function CustomSignIn() {
-  const [emailSent, setEmailSent] = useState(false);
-  const [code, setCode] = useState('');
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
-  const { signIn, setActive } = useSignIn();
-  const { isSignedIn } = useUser();
-
-  if (isSignedIn) {
-    return (
-      <div className="flex flex-col gap-2 p-4 items-start">
-        <div className="text-sm font-normal mb-1 text-left">You are currently signed in.</div>
-        <SignOutButton>
-          <button className="text-blue-600 underline text-sm text-left">Log out</button>
-        </SignOutButton>
-      </div>
-    );
-  }
-
-  async function sendEmailCode() {
-    setLoading(true);
-    setError('');
-    if (!signIn) {
-      setError('Sign in not ready. Please try again.');
-      setLoading(false);
-      return;
-    }
-    try {
-      await signIn.create({ identifier: 'studio@krisaziabor.com', strategy: 'email_code' });
-      setEmailSent(true);
-    } catch (err: any) {
-      setError(err.errors?.[0]?.message || err.message || 'Failed to send code');
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  async function resendEmailCode() {
-    setLoading(true);
-    setError('');
-    if (!signIn) {
-      setError('Sign in not ready. Please try again.');
-      setLoading(false);
-      return;
-    }
-    try {
-      await signIn.create({ identifier: 'studio@krisaziabor.com', strategy: 'email_code' });
-    } catch (err: any) {
-      setError(err.errors?.[0]?.message || err.message || 'Failed to resend code');
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  async function submitCode() {
-    setLoading(true);
-    setError('');
-    if (!signIn) {
-      setError('Sign in not ready. Please try again.');
-      setLoading(false);
-      return;
-    }
-    try {
-      const result = await signIn.attemptFirstFactor({ strategy: 'email_code', code });
-      if (result.status === 'complete') {
-        await setActive({ session: result.createdSessionId });
-        setEmailSent(false);
-        setCode('');
-      } else {
-        setError('Invalid code or not complete.');
-      }
-    } catch (err: any) {
-      setError(err.errors?.[0]?.message || err.message || 'Failed to verify code');
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  return (
-    <div className="flex flex-col gap-4 p-4">
-      <div className="text-lg font-semibold mb-2">Sign in</div>
-      {!emailSent ? (
-        <button
-          className="text-blue-600 font-semibold py-2 px-4 rounded bg-gray-100 hover:bg-blue-50 disabled:opacity-50"
-          onClick={sendEmailCode}
-          disabled={loading}
-        >
-          {loading ? 'Sending...' : 'Send email code'}
-        </button>
-      ) : (
-        <>
-          <input
-            type="text"
-            className="border rounded px-2 py-1 text-sm mb-2"
-            placeholder="Enter code"
-            value={code}
-            onChange={e => setCode(e.target.value)}
-            disabled={loading}
-          />
-          <div className="flex gap-2 mb-2">
-            <button
-              className="text-blue-600 underline text-sm"
-              onClick={resendEmailCode}
-              disabled={loading}
-            >
-              Resend
-            </button>
-            <button
-              className="text-blue-600 font-semibold py-1 px-3 rounded bg-gray-100 hover:bg-blue-50 text-sm"
-              onClick={submitCode}
-              disabled={loading || !code}
-            >
-              {loading ? 'Verifying...' : 'Enter'}
-            </button>
-          </div>
-        </>
-      )}
-      {error && <div className="text-red-500 text-xs mt-1">{error}</div>}
-      <div className="text-xs text-gray-500 mt-2">Sign in with studio@krisaziabor.com</div>
-    </div>
-  );
-}
-
 export default function Sidebar({
   onSelect,
   selected: selectedProp,
-  infoMode: infoModeProp,
-  setInfoMode: setInfoModeProp,
-  infoTab: infoTabProp,
-  setInfoTab: setInfoTabProp,
   initialView,
 }: {
   onSelect: (filter: { type: 'all' | 'category' | 'subcategory' | 'project'; id?: string; parentCategoryId?: string }) => void;
   selected?: { type: 'all' | 'category' | 'subcategory' | 'project'; id?: string };
-  infoMode?: boolean;
-  setInfoMode?: (v: boolean) => void;
-  infoTab?: 'information' | 'colophon' | 'login';
-  setInfoTab?: (v: 'information' | 'colophon' | 'login') => void;
   initialView?: 'tags' | 'projects';
 }) {
   // State for toggling between Tags and Projects
@@ -211,26 +80,12 @@ export default function Sidebar({
     id?: string;
   }>(selectedProp || { type: 'all' });
 
-  const [infoModeInternal, setInfoModeInternal] = useState(false);
-
-  const [infoTabInternal, setInfoTabInternal] = useState<'information' | 'colophon' | 'login'>(
-    'information'
-  );
-
   const [totalElements, setTotalElements] = useState<number>(0);
 
   const [searchValue, setSearchValue] = useState('');
 
   const router = useRouter();
   const searchParams = useSearchParams();
-
-  const infoMode = typeof infoModeProp === 'boolean' ? infoModeProp : infoModeInternal;
-
-  const setInfoMode = setInfoModeProp || setInfoModeInternal;
-
-  const infoTab = infoTabProp || infoTabInternal;
-
-  const setInfoTab = setInfoTabProp || setInfoTabInternal;
 
   useEffect(() => {
     if (selectedProp && (selectedProp.type !== selected.type || selectedProp.id !== selected.id)) {
@@ -342,156 +197,141 @@ export default function Sidebar({
   // Helper for color classes
 
   const getSidebarItemClass = (isSelected: boolean, isAll: boolean = false) =>
-    isAll
-      ? 'text-sm text-gray-500 hover:text-foreground transition-colors'
-      : `text-sm ${isSelected ? 'text-foreground' : 'text-gray-500'} hover:text-foreground transition-colors`;
+    [
+      'text-sm transition-colors cursor-pointer',
+      isSelected ? 'text-selected-light' : 'text-default-light',
+      'hover:text-selected-light'
+    ].join(' ');
 
   const getSidebarSubItemClass = (isSelected: boolean) =>
-    `text-xs ${isSelected ? 'text-foreground' : 'text-gray-500'} hover:text-foreground transition-colors`;
+    [
+      'text-xs transition-colors cursor-pointer',
+      isSelected ? 'text-selected-light' : 'text-default-light',
+      'hover:text-selected-light'
+    ].join(' ');
 
   const getSidebarButtonClass = (isSelected: boolean) =>
-    `text-sm focus:outline-none ${isSelected ? 'text-foreground' : 'text-gray-500'} hover:text-foreground transition-colors`;
+    [
+      'text-sm focus:outline-none transition-colors cursor-pointer',
+      isSelected ? 'text-selected-light' : 'text-default-light',
+      'hover:text-selected-light'
+    ].join(' ');
 
   const getSidebarBottomLinkClass = (isSelected: boolean) =>
-    `text-sm cursor-pointer ${isSelected ? 'text-foreground' : 'text-gray-500'} hover:text-foreground transition-colors`;
+    [
+      'text-sm cursor-pointer transition-colors',
+      isSelected ? 'text-selected-light' : 'text-default-light',
+      'hover:text-selected-light'
+    ].join(' ');
 
   return (
     <aside className="w-64 min-h-screen bg-white dark:bg-black flex flex-col pt-8 pb-8 pl-8 pr-4">
       <div className="flex flex-col w-full h-full flex-1 justify-between">
         {/* Top controls section container */}
 
-        {infoMode ? (
-          <div className="w-full flex flex-col gap-2 mb-6">
-            <span
-              className={`text-sm cursor-pointer ${infoTab === 'information' ? 'text-foreground' : 'text-gray-500'} hover:text-foreground font-[family-name:var(--font-albragrotesk)]`}
-              onClick={() => setInfoTab('information')}
-            >
-              Information
-            </span>
+        {/* Group 1: All with count aligned right */}
 
-            <span
-              className={`text-sm cursor-pointer ${infoTab === 'colophon' ? 'text-foreground' : 'text-gray-500'} hover:text-foreground font-[family-name:var(--font-albragrotesk)]`}
-              onClick={() => setInfoTab('colophon')}
-            >
-              Colophon
-            </span>
+        <div
+          className="group flex items-center w-full justify-between cursor-pointer font-[family-name:var(--font-albragrotesk)]"
+          onClick={handleSelectAll}
+        >
+          <span
+            className={getSidebarItemClass(false, true) + ' group-hover:text-selected-light'}
+          >
+            All
+          </span>
 
-            <span
-              className={`text-sm cursor-pointer ${infoTab === 'login' ? 'text-foreground' : 'text-gray-500'} hover:text-foreground font-[family-name:var(--font-albragrotesk)]`}
-              onClick={() => setInfoTab('login')}
+          <span
+            className={getSidebarItemClass(false, true) + ' group-hover:text-selected-light'}
+          >
+            {allCount}
+          </span>
+        </div>
+
+        {/* Group 2: Tags | Projects with vertical bar and toggle */}
+
+        <div className="flex items-center w-full font-[family-name:var(--font-albragrotesk)]">
+          <button
+            className={getSidebarButtonClass(view === 'tags')}
+            onClick={() => setView('tags')}
+            aria-pressed={view === 'tags'}
+            type="button"
+          >
+            Tags
+          </button>
+
+          <span className="h-4 w-px bg-foreground mx-2 font-[family-name:var(--font-albragrotesk)]" />
+
+          <button
+            className={getSidebarButtonClass(view === 'projects')}
+            onClick={() => setView('projects')}
+            aria-pressed={view === 'projects'}
+            type="button"
+          >
+            Projects
+          </button>
+        </div>
+
+        {/* Group 3: Search input with help icon */}
+        <div className="w-full relative flex items-center">
+          <form
+            onSubmit={e => {
+              e.preventDefault();
+              if (searchValue.trim()) {
+                router.push(`/search?q=${encodeURIComponent(searchValue.trim())}`);
+              }
+            }}
+            className="flex-1"
+          >
+            <input
+              type="text"
+              value={searchValue}
+              onChange={e => setSearchValue(e.target.value)}
+              placeholder="Search..."
+              className="w-full text-sm text-default-dark font-[family-name:var(--font-albragrotesk)] focus:outline-none bg-transparent border-none p-0 m-0 shadow-none"
+              aria-label="Search library"
+              style={{ boxShadow: 'none', background: 'none', border: 'none' }}
+            />
+          </form>
+          {/* Help icon */}
+          <div className="relative ml-2 group flex-shrink-0">
+            <button
+              type="button"
+              tabIndex={0}
+              aria-label="Search help"
+              className="text-gray-400 hover:text-black dark:hover:text-white focus:outline-none"
+              style={{ background: 'none', border: 'none', padding: 0, margin: 0, cursor: 'pointer' }}
             >
-              Sign in
-            </span>
+              <svg width="18" height="18" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="10" cy="10" r="9" stroke="currentColor" strokeWidth="1.5" fill="none" />
+                <text x="10" y="15" textAnchor="middle" fontSize="13" fill="currentColor" fontFamily="inherit">?</text>
+              </svg>
+            </button>
+            {/* Tooltip/modal */}
+            <div className="absolute right-auto left-2 top-7 z-50 w-64 bg-white dark:bg-black border border-gray-200 dark:border-gray-700 rounded shadow-lg px-4 py-3 text-xs text-black dark:text-white font-[family-name:var(--font-albragrotesk)] opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 pointer-events-none group-hover:pointer-events-auto group-focus-within:pointer-events-auto transition-opacity duration-150" role="tooltip">
+              Use <span className="font-mono bg-gray-100 dark:bg-gray-800 px-1 rounded">proj:</span> and <span className="font-mono bg-gray-100 dark:bg-gray-800 px-1 rounded">comm:</span> to filter for either connected projects or comments (or both together)
+            </div>
           </div>
-        ) : (
-          <>
-            {/* Group 1: All with count aligned right */}
-
-            <div
-              className="flex items-center w-full justify-between cursor-pointer font-[family-name:var(--font-albragrotesk)]"
-              onClick={handleSelectAll}
-            >
-              <span
-                className= {getSidebarItemClass(false, true)}
-              >
-                All
-              </span>
-
-              <span
-                className={getSidebarItemClass(false, true)}
-              >
-                {allCount}
-              </span>
-            </div>
-
-            {/* Group 2: Tags | Projects with vertical bar and toggle */}
-
-            <div className="flex items-center w-full font-[family-name:var(--font-albragrotesk)]">
-              <button
-                className={getSidebarButtonClass(view === 'tags')}
-                onClick={() => setView('tags')}
-                aria-pressed={view === 'tags'}
-                type="button"
-              >
-                Tags
-              </button>
-
-              <span className="h-4 w-px bg-foreground mx-2 font-[family-name:var(--font-albragrotesk)]" />
-
-              <button
-                className={getSidebarButtonClass(view === 'projects')}
-                onClick={() => setView('projects')}
-                aria-pressed={view === 'projects'}
-                type="button"
-              >
-                Projects
-              </button>
-            </div>
-
-            {/* Group 3: Search input with help icon */}
-            <div className="w-full relative flex items-center">
-              <form
-                onSubmit={e => {
-                  e.preventDefault();
-                  if (searchValue.trim()) {
-                    router.push(`/search?q=${encodeURIComponent(searchValue.trim())}`);
-                  }
-                }}
-                className="flex-1"
-              >
-                <input
-                  type="text"
-                  value={searchValue}
-                  onChange={e => setSearchValue(e.target.value)}
-                  placeholder="Search..."
-                  className="w-full text-sm text-foreground font-[family-name:var(--font-albragrotesk)] focus:outline-none bg-transparent border-none p-0 m-0 shadow-none"
-                  aria-label="Search library"
-                  style={{ boxShadow: 'none', background: 'none', border: 'none' }}
-                />
-              </form>
-              {/* Help icon */}
-              <div className="relative ml-2 group flex-shrink-0">
-                <button
-                  type="button"
-                  tabIndex={0}
-                  aria-label="Search help"
-                  className="text-gray-400 hover:text-black dark:hover:text-white focus:outline-none"
-                  style={{ background: 'none', border: 'none', padding: 0, margin: 0, cursor: 'pointer' }}
-                >
-                  <svg width="18" height="18" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <circle cx="10" cy="10" r="9" stroke="currentColor" strokeWidth="1.5" fill="none" />
-                    <text x="10" y="15" textAnchor="middle" fontSize="13" fill="currentColor" fontFamily="inherit">?</text>
-                  </svg>
-                </button>
-                {/* Tooltip/modal */}
-                <div className="absolute right-auto left-2 top-7 z-50 w-64 bg-white dark:bg-black border border-gray-200 dark:border-gray-700 rounded shadow-lg px-4 py-3 text-xs text-black dark:text-white font-[family-name:var(--font-albragrotesk)] opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 pointer-events-none group-hover:pointer-events-auto group-focus-within:pointer-events-auto transition-opacity duration-150" role="tooltip">
-                  Use <span className="font-mono bg-gray-100 dark:bg-gray-800 px-1 rounded">proj:</span> and <span className="font-mono bg-gray-100 dark:bg-gray-800 px-1 rounded">comm:</span> to filter for either connected projects or comments (or both together)
-                </div>
-              </div>
-            </div>
-          </>
-        )}
+        </div>
 
         {/* Middle list section container (vertically centered) */}
 
-        {!infoMode && (
+        {!loading && (
           <div className="w-full flex flex-col gap-1 my-auto overflow-y-auto">
-            {loading ? (
-              <span className="text-xs text-gray-400">Loading...</span>
-            ) : view === 'tags' ? (
+            {view === 'tags' ? (
               sortedCategories.map((cat) => {
                 const isDisabled = cat.count === 0;
                 return (
                   <React.Fragment key={cat._id}>
                     <div
-                      className={`flex items-center w-full justify-between ${isDisabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+                      className={`group flex items-center w-full justify-between ${isDisabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
                       onClick={isDisabled ? undefined : () => handleSelectCategory(cat._id)}
                     >
                       <span
                         className={getSidebarItemClass(
                           (selected.type === 'category' && selected.id === cat._id) ||
                             (selected.type === 'subcategory' && openCategory === cat._id)
-                        )}
+                        ) + ' group-hover:text-selected-light'}
                       >
                         {cat.name}
                       </span>
@@ -499,7 +339,7 @@ export default function Sidebar({
                         className={getSidebarItemClass(
                           (selected.type === 'category' && selected.id === cat._id) ||
                             (selected.type === 'subcategory' && openCategory === cat._id)
-                        )}
+                        ) + ' group-hover:text-selected-light'}
                       >
                         {cat.count}
                       </span>
@@ -512,20 +352,20 @@ export default function Sidebar({
                           return (
                             <div
                               key={sub._id}
-                              className={`flex items-center w-full justify-between ${isSubDisabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+                              className={`group flex items-center w-full justify-between ${isSubDisabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
                               onClick={isSubDisabled ? undefined : () => handleSelectSubcategory(sub._id, cat._id)}
                             >
                               <span
                                 className={getSidebarSubItemClass(
                                   selected.type === 'subcategory' && selected.id === sub._id
-                                )}
+                                ) + ' group-hover:text-selected-light'}
                               >
                                 {sub.name}
                               </span>
                               <span
                                 className={getSidebarSubItemClass(
                                   selected.type === 'subcategory' && selected.id === sub._id
-                                )}
+                                ) + ' group-hover:text-selected-light'}
                               >
                                 {sub.count}
                               </span>
@@ -540,7 +380,7 @@ export default function Sidebar({
             ) : (
               <>
                 <div
-                  className="mb-3 text-xs text-gray-500"
+                  className="mb-3 text-xs text-default-light"
                 >
                   Note: Not every element in the library is linked to a project. To view all
                   elements, toggle the Tags view instead.
@@ -551,11 +391,15 @@ export default function Sidebar({
                   return (
                     <div
                       key={proj._id}
-                      className={`flex items-center w-full justify-between ${isDisabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+                      className={`flex items-center w-full justify-between ${isDisabled ? 'opacity-50 cursor-not-allowed' : 'group cursor-pointer'}`}
                       onClick={isDisabled ? undefined : () => handleSelectProject(proj._id)}
                     >
                       <span
-                        className="text-sm text-foreground"
+                        className={
+                          isDisabled
+                            ? 'text-sm transition-colors text-default-light'
+                            : 'text-sm transition-colors text-default-light group-hover:text-selected-light'
+                        }
                       >
                         {proj.name}
                       </span>
@@ -570,25 +414,11 @@ export default function Sidebar({
         {/* Bottom section container */}
 
         <div className="w-full mt-6 mb-4 flex-shrink-0 flex items-center">
-          {infoMode ? (
-            <span
-              className={getSidebarBottomLinkClass(true)}
-              onClick={() => setInfoMode(false)}
-              tabIndex={0}
-              role="button"
-            >
-              Return
-            </span>
-          ) : (
-            <span
-              className={getSidebarBottomLinkClass(true)}
-              onClick={() => setInfoMode(true)}
-              tabIndex={0}
-              role="button"
-            >
-              KAKA Design Library
-            </span>
-          )}
+          <div className="group w-full">
+            <Link href="/info" className="text-sm cursor-pointer transition-colors text-default-light group-hover:text-selected-light">
+              KAKA
+            </Link>
+          </div>
         </div>
       </div>
     </aside>

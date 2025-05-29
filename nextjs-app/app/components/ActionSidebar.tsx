@@ -66,15 +66,19 @@ export default function ActionSidebar({ element, loading, onCommentAdded }: Acti
   async function handleAddComment() {
     if (!showInput) {
       setShowInput(true);
-
       setError('');
+      return;
+    }
 
+    if (showInput && !newComment.trim()) {
+      setShowInput(false);
+      setNewComment('');
+      setError('');
       return;
     }
 
     if (!newComment.trim()) {
       setError('Comment cannot be empty');
-
       return;
     }
 
@@ -217,24 +221,29 @@ export default function ActionSidebar({ element, loading, onCommentAdded }: Acti
             </span>
             {showProjectModal && (
               <div className="bg-white border rounded shadow p-4 mt-2 z-10">
-                <div className="mb-2 font-semibold text-black">Select projects to connect</div>
+                <div className="mb-2 font-semibold text-black text-sm">Select projects to connect</div>
                 {projectLoading ? (
                   <div className="text-gray-400 font-[family-name:var(--font-albragrotesk)]">Loading...</div>
                 ) : projectError ? (
                   <div className="text-red-500 text-xs font-[family-name:var(--font-albragrotesk)]">{projectError}</div>
                 ) : (
-                  <div className="flex flex-col gap-2 max-h-48 overflow-y-auto">
-                    {allProjects.map((proj) => (
-                      <label key={proj._id} className="flex items-center gap-2 cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={selectedProjects.includes(proj._id)}
-                          onChange={() => handleProjectCheckbox(proj._id)}
-                          className="accent-blue-600"
-                        />
-                        <span className="text-sm text-black font-[family-name:var(--font-albragrotesk)]">{proj.name}</span>
-                      </label>
-                    ))}
+                  <div className="flex flex-col gap-2 max-h-48 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent" style={{ scrollbarColor: '#d1d5db00 transparent', scrollbarWidth: 'thin' }}>
+                    {allProjects.map((proj) => {
+                      const selected = selectedProjects.includes(proj._id);
+                      return (
+                        <div
+                          key={proj._id}
+                          className={`px-3 py-2 rounded border cursor-pointer transition-colors ${selected ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'} text-sm text-black font-[family-name:var(--font-albragrotesk)]`}
+                          onClick={() => handleProjectCheckbox(proj._id)}
+                          tabIndex={0}
+                          role="button"
+                          aria-pressed={selected}
+                          style={{ outline: 'none' }}
+                        >
+                          {proj.name}
+                        </div>
+                      );
+                    })}
                   </div>
                 )}
                 <button
