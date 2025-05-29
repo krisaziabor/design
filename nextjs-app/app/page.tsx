@@ -3,7 +3,7 @@
 import React, { useEffect, useState, Suspense } from 'react';
 
 import Sidebar from '@/app/components/Sidebar';
-
+import MobileDrawerMenu from '@/app/components/MobileDrawerMenu';
 
 import { createClient } from 'next-sanity';
 import { apiVersion, dataset, projectId } from '@/sanity/lib/api';
@@ -19,6 +19,17 @@ const clientNoCdn = createClient({
   useCdn: false,
   perspective: 'published',
 });
+
+function useIsMobile() {
+  const [isMobile, setIsMobile] = React.useState(false);
+  React.useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768);
+    check();
+    window.addEventListener('resize', check);
+    return () => window.removeEventListener('resize', check);
+  }, []);
+  return isMobile;
+}
 
 function PageContent() {
   const searchParams = useSearchParams();
@@ -112,19 +123,21 @@ function PageContent() {
     );
   }
 
-  return (
-    <div className="min-h-screen flex flex-row bg-white dark:bg-black">
-      {/* Main Sidebar */}
+  const isMobile = useIsMobile();
 
+  return (
+    <>
+    <div className="min-h-screen flex flex-row bg-white dark:bg-black">
+        {/* Main Sidebar (desktop only) */}
+        {!isMobile && (
       <div className="sticky top-0 h-screen z-10">
         <Sidebar
           onSelect={setSelectedFilter}
           selected={selectedFilter}
         />
       </div>
-
+        )}
       {/* Main Content */}
-
       <main className="flex-1 flex flex-col items-center px-4 py-8 overflow-y-auto max-h-screen text-black dark:text-white">
         <div className="w-full max-w-6xl flex flex-col gap-8">
           {loading ? (
@@ -145,6 +158,11 @@ function PageContent() {
         </div>
       </main>
     </div>
+      {/* Mobile Drawer Menu (mobile only, overlays content) */}
+      {isMobile && (
+        <MobileDrawerMenu selected={selectedFilter} onSelect={setSelectedFilter} />
+      )}
+    </>
   );
 }
 

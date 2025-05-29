@@ -34,6 +34,17 @@ const clientNoCdn = createClient({
   perspective: 'published',
 });
 
+function useIsMobile() {
+  const [isMobile, setIsMobile] = React.useState(false);
+  React.useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768);
+    check();
+    window.addEventListener('resize', check);
+    return () => window.removeEventListener('resize', check);
+  }, []);
+  return isMobile;
+}
+
 export default function ElementPageHandler() {
   const { id } = useParams();
 
@@ -151,13 +162,20 @@ export default function ElementPageHandler() {
     handleSidebarSelect(filter, router);
   }
 
+  const isMobile = useIsMobile();
+
   return (
     <div className="min-h-screen flex flex-row bg-white dark:bg-black">
       {/* Main Sidebar */}
       <div className="sticky top-0 h-screen z-10">
         <Sidebar onSelect={onSidebarSelect} selected={selectedFilter} initialView={selectedFilter.type === 'project' ? 'projects' : 'tags'} />
       </div>
-
+      {/* Action Sidebar (desktop only) */}
+      {!isMobile && (
+        <div className="sticky top-0 h-screen z-10">
+          <ActionSidebar element={element} loading={loading} />
+        </div>
+      )}
       {/* Main Content */}
       <main className="flex-1 flex flex-col items-center px-4 py-8 overflow-y-auto max-h-screen text-black dark:text-white">
         {/* Prev/Next Navigation */}
