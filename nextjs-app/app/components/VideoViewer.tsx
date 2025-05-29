@@ -82,20 +82,20 @@ export default function VideoViewer({ videoUrl }: { videoUrl: string }) {
         style={{ width: videoWidth ? videoWidth : undefined, margin: '0 auto' }}
       >
         {/* Timestamp on the left */}
-        <span className="text-xs text-gray-700">
+        <span className="text-xs text-default-light dark:text-default-dark">
           {formatTime(currentTime)} / {formatTime(duration)}
         </span>
         {/* Controls on the right */}
         <div className="flex flex-row gap-4 items-center">
           <button
-            className="text-sm text-black px-2 py-1 bg-transparent border-none shadow-none hover:bg-transparent focus:outline-none"
+            className="text-sm text-default-light dark:text-default-dark hover:text-selected-light dark:hover:text-selected-dark px-2 py-1 bg-transparent border-none shadow-none hover:bg-transparent focus:outline-none"
             onClick={handleRestart}
             type="button"
           >
             Restart
           </button>
           <button
-            className="text-sm text-black px-2 py-1 bg-transparent border-none shadow-none hover:bg-transparent focus:outline-none"
+            className="text-sm text-default-light dark:text-default-dark hover:text-selected-light dark:hover:text-selected-dark px-2 py-1 bg-transparent border-none shadow-none hover:bg-transparent focus:outline-none"
             onClick={handleMuteUnmute}
             type="button"
           >

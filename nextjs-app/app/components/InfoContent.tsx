@@ -1,8 +1,13 @@
 import React from 'react';
 
-export default function InfoContent() {
+export default function InfoContent({ lastUpdated }: { lastUpdated?: string }) {
   return (
-    <div className="w-full max-w-xl text-sm text-black font-normal space-y-4 font-[family-name:var(--font-albragrotesk)]">
+    <div className="w-full max-w-xl text-sm text-selected-light dark:text-selected-dark font-normal space-y-4 font-[family-name:var(--font-albragrotesk)]">
+      {lastUpdated && (
+        <p className="text-default-light dark:text-default-dark">
+          Elements last added {new Date(lastUpdated).toLocaleDateString()}
+        </p>
+      )}
       <p>
         KAKA Design Library is the first of several archival web projects I intend on creating this
         summer for my personal practices.
@@ -23,7 +28,7 @@ export default function InfoContent() {
         All rights belong to the respective owners of the content. Every element on this site has
         its own source accessible at the bottom of the second sidebar (marked by a url with an
         arrow). If you have any questions or concerns, please reach out to me at{' '}
-        <a href="mailto:studio@krisaziabor.com" className="underline hover:text-black text-gray-700">studio@krisaziabor.com</a>.
+        <a href="mailto:studio@krisaziabor.com" className="underline hover:text-selected-light dark:hover:text-selected-dark text-default-light dark:text-default-dark">studio@krisaziabor.com</a>.
       </p>
     </div>
   );

@@ -49,9 +49,6 @@ export default function ElementPageHandler() {
 
   const [similarLoading, setSimilarLoading] = useState(false);
 
-  const [infoMode, setInfoMode] = useState(false);
-  const [infoTab, setInfoTab] = useState<'information' | 'colophon' | 'login'>('information');
-
   // Determine selected filter from URL
 
   let selectedFilter: { type: 'all' | 'category' | 'subcategory' | 'project'; id?: string } = { type: 'all' };
@@ -161,11 +158,6 @@ export default function ElementPageHandler() {
         <Sidebar onSelect={onSidebarSelect} selected={selectedFilter} initialView={selectedFilter.type === 'project' ? 'projects' : 'tags'} />
       </div>
 
-      {/* Only show ActionSidebar and element content if not in infoMode */}
-      {!infoMode && (
-        <ActionSidebar element={element} loading={loading} onCommentAdded={fetchElement} />
-      )}
-
       {/* Main Content */}
       <main className="flex-1 flex flex-col items-center px-4 py-8 overflow-y-auto max-h-screen text-black dark:text-white">
         {/* Prev/Next Navigation */}
@@ -184,14 +176,14 @@ export default function ElementPageHandler() {
               return (
                 <div className="flex gap-6">
                   {prev ? (
-                    <Link href={`/elements/${prev._id}${paramStr}`} className="text-sm text-blue-200 hover:text-black cursor-pointer select-none">Prev</Link>
+                    <Link href={`/elements/${prev._id}${paramStr}`} className="text-sm text-default-light dark:text-default-dark hover:text-selected-light dark:hover:text-selected-dark cursor-pointer select-none">Prev</Link>
                   ) : (
-                    <span className="text-sm text-blue-400 cursor-not-allowed select-none">Prev</span>
+                    <span className="text-sm text-default-light dark:text-default-dark opacity-50 cursor-not-allowed select-none">Prev</span>
                   )}
                   {next ? (
-                    <Link href={`/elements/${next._id}${paramStr}`} className="text-sm text-gray-400 hover:text-black cursor-pointer select-none transition-colors">Next</Link>
+                    <Link href={`/elements/${next._id}${paramStr}`} className="text-sm text-default-light dark:text-default-dark hover:text-selected-light dark:hover:text-selected-dark cursor-pointer select-none transition-colors">Next</Link>
                   ) : (
-                    <span className="text-sm text-gray-400 cursor-not-allowed select-none">Next</span>
+                    <span className="text-sm text-default-light dark:text-default-dark opacity-50 cursor-not-allowed select-none">Next</span>
                   )}
                 </div>
               );
@@ -199,311 +191,243 @@ export default function ElementPageHandler() {
           </div>
         )}
 
-        {infoMode ? (
-          infoTab === 'information' ? (
-            <div className="w-2/5 text-sm text-black font-normal whitespace-pre-line font-[family-name:var(--font-albragrotesk)]">
-              {`The Design Library is the first of several library projects I intend on creating this summer.\n\nScouring the internet for the best websites, brand guidelines, and graphics is my favorite form of procrastination, and I wanted to share this tradition with the web. \n\nThe KAKA Literary Library & Photographers Library are both on the way.\n\nSummer 2025`}
-            </div>
-          ) : infoTab === 'colophon' ? (
-            <div className="w-2/5 text-sm text-black font-normal space-y-2 font-[family-name:var(--font-albragrotesk)]">
-              <div>
-                Typography &rarr; Albra Grotesk by{' '}
-                <a
-                  href="https://ultra-kuhl.com/en/albra"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="underline hover:text-black text-gray-700"
-                >
-                  Ultra Kuhl Type Foundry
-                </a>
-              </div>
-              <div>
-                CMS &rarr;{' '}
-                <a
-                  href="https://www.sanity.io/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="underline hover:text-black text-gray-700"
-                >
-                  Sanity
-                </a>
-              </div>
-              <div>
-                Local software &rarr;{' '}
-                <a
-                  href="https://eagle.cool/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="underline hover:text-black text-gray-700"
-                >
-                  Eagle
-                </a>
-              </div>
-              <div>
-                Inspiration &rarr;{' '}
-                <a
-                  href="https://archive.saman.design/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="underline hover:text-black text-gray-700"
-                >
-                  Saman Archive
-                </a>
-                ,{' '}
-                <a
-                  href="https://www.chris-wang.com/collection"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="underline hover:text-black text-gray-700"
-                >
-                  Chris Wang Collection
-                </a>
-              </div>
-            </div>
-          ) : infoTab === 'login' ? (
-            <div className="w-2/5 text-sm text-black font-normal font-[family-name:var(--font-albragrotesk)]">
-              {/* You can add your sign in component here if needed */}
-            </div>
-          ) : null
-        ) : (
-          loading ? (
-            <div className="text-center text-gray-700 font-[family-name:var(--font-albragrotesk)]">One moment...</div>
-          ) : element ? (
-            <div className="w-full max-w-4xl flex flex-col items-center text-black dark:text-white">
-              {/* Video display logic for mov/mp4/gif */}
+        {loading ? (
+          <div className="text-center text-gray-700 font-[family-name:var(--font-albragrotesk)]">One moment...</div>
+        ) : element ? (
+          <div className="w-full max-w-4xl flex flex-col items-center text-black dark:text-white">
+            {/* Video display logic for mov/mp4/gif */}
 
-              {(() => {
-                const videoTypes = ['mov', 'mp4'];
+            {(() => {
+              const videoTypes = ['mov', 'mp4'];
 
-                const fileType = (element.fileType || '').toLowerCase();
+              const fileType = (element.fileType || '').toLowerCase();
 
-                let fileUrl: string | undefined = undefined;
+              let fileUrl: string | undefined = undefined;
 
-                if (
-                  element.file &&
-                  element.file.asset?._ref &&
-                  (videoTypes.includes(fileType) || fileType === 'gif')
-                ) {
-                  const assetId = element.file.asset._ref.replace('file-', '').replace(/-.*/, '');
+              if (
+                element.file &&
+                element.file.asset?._ref &&
+                (videoTypes.includes(fileType) || fileType === 'gif')
+              ) {
+                const assetId = element.file.asset._ref.replace('file-', '').replace(/-.*/, '');
 
-                  const ext = fileType;
+                const ext = fileType;
 
-                  fileUrl = `https://cdn.sanity.io/files/${process.env.NEXT_PUBLIC_SANITY_PROJECT_ID}/${process.env.NEXT_PUBLIC_SANITY_DATASET}/${assetId}.${ext}`;
-                }
+                fileUrl = `https://cdn.sanity.io/files/${process.env.NEXT_PUBLIC_SANITY_PROJECT_ID}/${process.env.NEXT_PUBLIC_SANITY_DATASET}/${assetId}.${ext}`;
+              }
 
-                // --- YOUTUBE EMBED LOGIC ---
+              // --- YOUTUBE EMBED LOGIC ---
 
-                if (fileType === 'youtube' && element.url) {
-                  // Extract YouTube video ID from URL
+              if (fileType === 'youtube' && element.url) {
+                // Extract YouTube video ID from URL
 
-                  const match = element.url.match(
-                    /(?:youtube\.com\/.*[?&]v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/
-                  );
+                const match = element.url.match(
+                  /(?:youtube\.com\/.*[?&]v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/
+                );
 
-                  const videoId = match ? match[1] : null;
+                const videoId = match ? match[1] : null;
 
-                  if (videoId) {
-                    const embedUrl = `https://www.youtube.com/embed/${videoId}`;
+                if (videoId) {
+                  const embedUrl = `https://www.youtube.com/embed/${videoId}`;
 
-                    return (
-                      <div className="w-full flex justify-center">
-                        <iframe
-                          width="800"
-                          height="450"
-                          src={embedUrl}
-                          title="YouTube video player"
-                          frameBorder="0"
-                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                          allowFullScreen
-                          className="rounded max-w-full max-h-[70vh]"
-                        ></iframe>
-                      </div>
-                    );
-                  } else {
-                    return (
-                      <div className="mt-4 p-2 bg-yellow-100 text-yellow-800 rounded">
-                        Invalid YouTube URL: <code className="break-all">{element.url}</code>
-                      </div>
-                    );
-                  }
-                }
-
-                // --- END YOUTUBE EMBED LOGIC ---
-
-                if (fileType === 'gif' && fileUrl) {
                   return (
-                    <img
-                      src={fileUrl}
-                      alt={element.fileName || 'GIF'}
-                      className="max-w-full max-h-[70vh] rounded"
-                      style={{ display: 'block', margin: '0 auto' }}
-                    />
+                    <div className="w-full flex justify-center">
+                      <iframe
+                        width="800"
+                        height="450"
+                        src={embedUrl}
+                        title="YouTube video player"
+                        frameBorder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        allowFullScreen
+                        className="rounded max-w-full max-h-[70vh]"
+                      ></iframe>
+                    </div>
                   );
-                }
-
-                if (fileUrl && videoTypes.includes(fileType)) {
-                  // Minimalist video viewer with play/pause and mute/unmute
-
-                  return <VideoViewer videoUrl={fileUrl} />;
-                }
-
-                // If fileUrl is set but not rendered, show the URL for debugging
-
-                if (fileUrl) {
+                } else {
                   return (
                     <div className="mt-4 p-2 bg-yellow-100 text-yellow-800 rounded">
-                      Debug: File URL = <code className="break-all">{fileUrl ?? 'undefined'}</code>
+                      Invalid YouTube URL: <code className="break-all">{element.url}</code>
                     </div>
                   );
                 }
+              }
 
-                // --- URL IMAGE LOGIC ---
+              // --- END YOUTUBE EMBED LOGIC ---
 
-                if (fileType === 'url' && element.file && element.file.asset?._ref) {
-                  const assetRef = element.file.asset._ref;
+              if (fileType === 'gif' && fileUrl) {
+                return (
+                  <img
+                    src={fileUrl}
+                    alt={element.fileName || 'GIF'}
+                    className="max-w-full max-h-[70vh] rounded"
+                    style={{ display: 'block', margin: '0 auto' }}
+                  />
+                );
+              }
 
-                  if (assetRef.startsWith('image-')) {
-                    const imageUrl = urlForImage(element.file)?.width(1200).height(800).url();
+              if (fileUrl && videoTypes.includes(fileType)) {
+                // Minimalist video viewer with play/pause and mute/unmute
 
-                    if (imageUrl) {
-                      return (
-                        <div>
-                          <img
-                            src={imageUrl}
-                            alt={element.fileName || 'URL Image'}
-                            className="mb-4"
-                          />
-                        </div>
-                      );
-                    }
-                  } else if (assetRef.startsWith('file-')) {
-                    const assetId = assetRef.replace('file-', '').replace(/-.*/, '');
+                return <VideoViewer videoUrl={fileUrl} />;
+              }
 
-                    const extMatch = assetRef.match(/-([a-z0-9]+)$/i);
+              // If fileUrl is set but not rendered, show the URL for debugging
 
-                    const ext = extMatch ? extMatch[1] : 'png';
+              if (fileUrl) {
+                return (
+                  <div className="mt-4 p-2 bg-yellow-100 text-yellow-800 rounded">
+                    Debug: File URL = <code className="break-all">{fileUrl ?? 'undefined'}</code>
+                  </div>
+                );
+              }
 
-                    const imageExts = ['png', 'jpg', 'jpeg', 'gif', 'webp', 'svg', 'avif', 'heic'];
+              // --- URL IMAGE LOGIC ---
 
-                    if (imageExts.includes(ext.toLowerCase())) {
-                      const fileUrl = `https://cdn.sanity.io/files/${process.env.NEXT_PUBLIC_SANITY_PROJECT_ID}/${process.env.NEXT_PUBLIC_SANITY_DATASET}/${assetId}.${ext}`;
+              if (fileType === 'url' && element.file && element.file.asset?._ref) {
+                const assetRef = element.file.asset._ref;
 
-                      return (
-                        <div>
-                          <img src={fileUrl} alt={element.fileName || 'URL File'} className="mb-4" />
-                        </div>
-                      );
-                    }
-                  }
-                }
+                if (assetRef.startsWith('image-')) {
+                  const imageUrl = urlForImage(element.file)?.width(1200).height(800).url();
 
-                // --- END URL IMAGE LOGIC ---
-
-                // --- SVG FILE LOGIC ---
-
-                if (fileType === 'svg' && element.file && element.file.asset?._ref) {
-                  const assetRef = element.file.asset._ref;
-
-                  if (assetRef.startsWith('file-')) {
-                    const assetId = assetRef.replace('file-', '').replace(/-.*/, '');
-
-                    const fileUrl = `https://cdn.sanity.io/files/${process.env.NEXT_PUBLIC_SANITY_PROJECT_ID}/${process.env.NEXT_PUBLIC_SANITY_DATASET}/${assetId}.svg`;
-
-                    return (
-                      <div className="pt-8">
-                        <img src={fileUrl} alt={element.fileName || 'SVG File'} className="mb-4" />
-                      </div>
-                    );
-                  }
-                }
-
-                // --- END SVG FILE LOGIC ---
-
-                // --- GENERIC IMAGE FILE LOGIC ---
-
-                const genericImageTypes = ['jpg', 'jpeg', 'png', 'webp', 'avif', 'heic', 'svg'];
-
-                if (
-                  genericImageTypes.includes(fileType) &&
-                  element.file &&
-                  element.file.asset?._ref
-                ) {
-                  const assetRef = element.file.asset._ref;
-
-                  if (assetRef.startsWith('file-')) {
-                    const assetId = assetRef.replace('file-', '').replace(/-.*/, '');
-
-                    const extMatch = assetRef.match(/-([a-z0-9]+)$/i);
-
-                    const ext = extMatch ? extMatch[1] : fileType;
-
-                    const fileUrl = `https://cdn.sanity.io/files/${process.env.NEXT_PUBLIC_SANITY_PROJECT_ID}/${process.env.NEXT_PUBLIC_SANITY_DATASET}/${assetId}.${ext}`;
-
+                  if (imageUrl) {
                     return (
                       <div>
                         <img
-                          src={fileUrl}
-                          alt={element.fileName || `${ext.toUpperCase()} File`}
+                          src={imageUrl}
+                          alt={element.fileName || 'URL Image'}
                           className="mb-4"
                         />
                       </div>
                     );
                   }
-                }
+                } else if (assetRef.startsWith('file-')) {
+                  const assetId = assetRef.replace('file-', '').replace(/-.*/, '');
 
-                // --- END GENERIC IMAGE FILE LOGIC ---
+                  const extMatch = assetRef.match(/-([a-z0-9]+)$/i);
 
-                // --- PDF FILE LOGIC ---
+                  const ext = extMatch ? extMatch[1] : 'png';
 
-                if (fileType === 'pdf' && element.file && element.file.asset?._ref) {
-                  const assetRef = element.file.asset._ref;
+                  const imageExts = ['png', 'jpg', 'jpeg', 'gif', 'webp', 'svg', 'avif', 'heic'];
 
-                  if (assetRef.startsWith('file-')) {
-                    const assetId = assetRef.replace('file-', '').replace(/-.*/, '');
-
-                    const fileUrl = `https://cdn.sanity.io/files/${process.env.NEXT_PUBLIC_SANITY_PROJECT_ID}/${process.env.NEXT_PUBLIC_SANITY_DATASET}/${assetId}.pdf`;
+                  if (imageExts.includes(ext.toLowerCase())) {
+                    const fileUrl = `https://cdn.sanity.io/files/${process.env.NEXT_PUBLIC_SANITY_PROJECT_ID}/${process.env.NEXT_PUBLIC_SANITY_DATASET}/${assetId}.${ext}`;
 
                     return (
-                      <div className="w-full flex justify-center">
-                        <iframe
-                          src={fileUrl}
-                          title={element.fileName || 'PDF File'}
-                          width="800"
-                          height="1000"
-                          style={{ width: '100%', maxWidth: 800, minHeight: 600 }}
-                          allowFullScreen
-                        />
+                      <div>
+                        <img src={fileUrl} alt={element.fileName || 'URL File'} className="mb-4" />
                       </div>
                     );
                   }
                 }
+              }
 
-                // --- END PDF FILE LOGIC ---
+              // --- END URL IMAGE LOGIC ---
 
-                return (
-                  <pre className="text-xs text-gray-500 bg-gray-100 p-2 rounded mb-2">
-                    {JSON.stringify(
-                      {
-                        file: element.file,
+              // --- SVG FILE LOGIC ---
 
-                        assetRef: element.file?.asset?._ref,
+              if (fileType === 'svg' && element.file && element.file.asset?._ref) {
+                const assetRef = element.file.asset._ref;
 
-                        fileType,
+                if (assetRef.startsWith('file-')) {
+                  const assetId = assetRef.replace('file-', '').replace(/-.*/, '');
 
-                        projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID,
+                  const fileUrl = `https://cdn.sanity.io/files/${process.env.NEXT_PUBLIC_SANITY_PROJECT_ID}/${process.env.NEXT_PUBLIC_SANITY_DATASET}/${assetId}.svg`;
 
-                        dataset: process.env.NEXT_PUBLIC_SANITY_DATASET,
-                      },
-                      null,
-                      2
-                    )}
-                  </pre>
-                );
-              })()}
-            </div>
-          ) : (
-            <div className="text-center text-red-400">Element not found.</div>
-          )
+                  return (
+                    <div className="pt-8">
+                      <img src={fileUrl} alt={element.fileName || 'SVG File'} className="mb-4" />
+                    </div>
+                  );
+                }
+              }
+
+              // --- END SVG FILE LOGIC ---
+
+              // --- GENERIC IMAGE FILE LOGIC ---
+
+              const genericImageTypes = ['jpg', 'jpeg', 'png', 'webp', 'avif', 'heic', 'svg'];
+
+              if (
+                genericImageTypes.includes(fileType) &&
+                element.file &&
+                element.file.asset?._ref
+              ) {
+                const assetRef = element.file.asset._ref;
+
+                if (assetRef.startsWith('file-')) {
+                  const assetId = assetRef.replace('file-', '').replace(/-.*/, '');
+
+                  const extMatch = assetRef.match(/-([a-z0-9]+)$/i);
+
+                  const ext = extMatch ? extMatch[1] : fileType;
+
+                  const fileUrl = `https://cdn.sanity.io/files/${process.env.NEXT_PUBLIC_SANITY_PROJECT_ID}/${process.env.NEXT_PUBLIC_SANITY_DATASET}/${assetId}.${ext}`;
+
+                  return (
+                    <div>
+                      <img
+                        src={fileUrl}
+                        alt={element.fileName || `${ext.toUpperCase()} File`}
+                        className="mb-4"
+                      />
+                    </div>
+                  );
+                }
+              }
+
+              // --- END GENERIC IMAGE FILE LOGIC ---
+
+              // --- PDF FILE LOGIC ---
+
+              if (fileType === 'pdf' && element.file && element.file.asset?._ref) {
+                const assetRef = element.file.asset._ref;
+
+                if (assetRef.startsWith('file-')) {
+                  const assetId = assetRef.replace('file-', '').replace(/-.*/, '');
+
+                  const fileUrl = `https://cdn.sanity.io/files/${process.env.NEXT_PUBLIC_SANITY_PROJECT_ID}/${process.env.NEXT_PUBLIC_SANITY_DATASET}/${assetId}.pdf`;
+
+                  return (
+                    <div className="w-full flex justify-center">
+                      <iframe
+                        src={fileUrl}
+                        title={element.fileName || 'PDF File'}
+                        width="800"
+                        height="1000"
+                        style={{ width: '100%', maxWidth: 800, minHeight: 600 }}
+                        allowFullScreen
+                      />
+                    </div>
+                  );
+                }
+              }
+
+              // --- END PDF FILE LOGIC ---
+
+              return (
+                <pre className="text-xs text-gray-500 bg-gray-100 p-2 rounded mb-2">
+                  {JSON.stringify(
+                    {
+                      file: element.file,
+
+                      assetRef: element.file?.asset?._ref,
+
+                      fileType,
+
+                      projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID,
+
+                      dataset: process.env.NEXT_PUBLIC_SANITY_DATASET,
+                    },
+                    null,
+                    2
+                  )}
+                </pre>
+              );
+            })()}
+          </div>
+        ) : (
+          <div className="text-center text-red-400">Element not found.</div>
         )}
 
         {/* Comment Section */}
@@ -521,7 +445,7 @@ export default function ElementPageHandler() {
 
         {element && (
           <div className="w-full max-w-4xl mx-auto mt-8">
-            <div className="mb-2 font-semibold text-sm text-black dark:text-white">
+            <div className="mb-2 font-semibold text-sm text-selected-light dark:text-selected-dark">
               Similar elements
             </div>
 
@@ -534,7 +458,7 @@ export default function ElementPageHandler() {
                 ))}
               </div>
             ) : (
-              <div className="text-gray-400 text-sm dark:text-gray-300">
+              <div className="text-default-light dark:text-default-dark text-sm">
                 This element does not share a source with any others.
               </div>
             )}

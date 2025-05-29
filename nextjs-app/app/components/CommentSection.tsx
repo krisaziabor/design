@@ -68,7 +68,7 @@ export default function CommentSection({ comments, id, elementId, onCommentDelet
     return (
       <div id={id} className="w-full max-w-4xl mx-auto border-t border-gray-200 mt-8 pt-8 text-sm">
         <div className="mb-4 font-semibold">All comments</div>
-        <div className="text-gray-400">No comments yet.</div>
+        <div className="text-default-light dark:text-default-dark">No comments yet.</div>
       </div>
     );
   }
@@ -81,10 +81,10 @@ export default function CommentSection({ comments, id, elementId, onCommentDelet
         {sortedComments.map((comment) => (
           <div key={comment._key || comment.dateAdded} className="flex flex-col text-sm">
             <div className="flex items-center justify-between mb-1">
-              <span className="text-gray-400">{formatCommentDate(comment.dateAdded)}</span>
+              <span className="text-default-light dark:text-default-dark">{formatCommentDate(comment.dateAdded)}</span>
               {isSignedIn && (
                 <button
-                  className="ml-2 text-gray-400 hover:text-red-500 focus:outline-none"
+                  className="ml-2 text-default-light dark:text-default-dark hover:text-red-500 focus:outline-none"
                   title="Delete comment"
                   onClick={() => openConfirm(comment._key)}
                   disabled={deleting === comment._key}
@@ -99,16 +99,16 @@ export default function CommentSection({ comments, id, elementId, onCommentDelet
                 </button>
               )}
             </div>
-            <span className="text-black">{comment.text}</span>
+            <span className="text-selected-light dark:text-selected-dark">{comment.text}</span>
             {/* Confirmation Modal */}
             {confirmKey === comment._key && (
               <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-                <div className="bg-white rounded shadow-lg p-6 max-w-sm w-full text-center">
-                  <div className="mb-4 text-lg font-semibold text-black">Delete this comment?</div>
-                  <div className="mb-6 text-gray-700">Are you sure you want to delete this comment? This action cannot be undone.</div>
+                <div className="bg-white dark:bg-black rounded shadow-lg p-6 max-w-sm w-full text-center">
+                  <div className="mb-4 text-lg font-semibold text-black dark:text-white">Delete this comment?</div>
+                  <div className="mb-6 text-default-light dark:text-default-dark">Are you sure you want to delete this comment? This action cannot be undone.</div>
                   <div className="flex justify-center gap-4">
                     <button
-                      className="px-4 py-2 rounded bg-gray-200 text-gray-800 hover:bg-gray-300 focus:outline-none"
+                      className="px-4 py-2 rounded bg-gray-200 dark:bg-gray-800 text-gray-800 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-700 focus:outline-none"
                       onClick={closeConfirm}
                       disabled={deleting === comment._key}
                     >

@@ -22,8 +22,6 @@ export default function ProjectPage() {
 
   const [elements, setElements] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [infoMode, setInfoMode] = useState(false);
-  const [infoTab, setInfoTab] = useState<'information' | 'colophon' | 'login'>('information');
   const [projectExists, setProjectExists] = useState(true);
   const [projectDescription, setProjectDescription] = useState<string | null>(null);
 
@@ -77,15 +75,15 @@ export default function ProjectPage() {
         <Sidebar onSelect={handleSidebarSelect} selected={selectedFilter} initialView="projects" />
       </div>
       {/* Main Content */}
-      <main className="flex-1 flex flex-col items-center px-4 py-8 overflow-y-auto max-h-screen text-black dark:text-white">
+      <main className="flex-1 flex flex-col items-center px-4 py-8 overflow-y-auto max-h-screen text-selected-light dark:text-selected-dark">
         {loading ? (
-          <div className="text-center text-gray-700 font-[family-name:var(--font-albragrotesk)]">One sec...</div>
+          <div className="text-center text-default-light dark:text-default-dark font-[family-name:var(--font-albragrotesk)]">One sec...</div>
         ) : !projectExists ? (
           <div className="text-center text-red-500 text-xl font-bold font-[family-name:var(--font-albragrotesk)]">
             Project not found.
           </div>
         ) : elements.length === 0 ? (
-          <div className="text-center text-gray-400 font-[family-name:var(--font-albragrotesk)]">
+          <div className="text-center text-default-light dark:text-default-dark font-[family-name:var(--font-albragrotesk)]">
             No elements found for this project.
           </div>
         ) : (

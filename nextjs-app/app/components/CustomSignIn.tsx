@@ -15,9 +15,9 @@ export default function CustomSignIn() {
   if (isSignedIn) {
     return (
       <div className="flex flex-col gap-2 p-4 items-start">
-        <div className="text-sm font-normal mb-1 text-left">You are currently signed in.</div>
+        <div className="text-sm text-selected-light dark:text-selected-dark mb-1 text-left">You are currently signed in.</div>
         <SignOutButton>
-          <button className="text-blue-600 underline text-sm text-left">Log out</button>
+          <button className="text-default-light dark:text-default-dark hover:text-selected-light dark:hover:text-selected-dark text-sm text-left">Log out</button>
         </SignOutButton>
       </div>
     );
@@ -112,13 +112,13 @@ export default function CustomSignIn() {
   if (!permanentCodeEntered) {
     return (
       <div className="flex flex-col gap-4 items-start w-full max-w-md">
-        <div className="text-sm font-normal mb-2 text-left">For Kris only – Please enter the permanent code before we ask for a second form of verification.</div>
+        <div className="text-sm text-selected-light dark:text-selected-dark mb-2 text-left">For Kris only – Please enter the permanent code before we ask for a second form of verification.</div>
         <div className="w-full flex flex-col gap-2">
           <input
             id="permanent-code-input"
             type="password"
             placeholder="Permanent code"
-            className="border rounded px-3 py-2 text-sm bg-white dark:bg-black text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-400"
+            className="border rounded px-3 py-2 text-sm bg-white dark:bg-black text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-default-light dark:focus:ring-default-dark"
             value={permanentCode}
             onChange={e => {
               setPermanentCode(e.target.value);
@@ -134,7 +134,7 @@ export default function CustomSignIn() {
             disabled={loading || verifying}
           />
           <button
-            className="mt-2 text-sm font-semibold bg-black text-white px-4 py-2 rounded disabled:opacity-50"
+            className="mt-2 text-sm font-semibold bg-selected-light dark:bg-selected-dark text-selected-dark dark:text-selected-light px-4 py-2 rounded disabled:opacity-50"
             style={{ display: permanentCode ? 'block' : 'none' }}
             disabled={loading || verifying || !permanentCode}
             onClick={verifyPermanentCode}
@@ -152,7 +152,7 @@ export default function CustomSignIn() {
     <div className="flex flex-col gap-4">
       {!emailSent ? (
         <button
-          className="text-sm text-gray-700 hover:text-black font-normal underline text-left"
+          className="text-sm text-selected-light dark:text-selected-dark hover:text-default-light dark:hover:text-default-dark font-normal underline text-left"
           onClick={sendEmailCode}
           disabled={loading}
         >
@@ -162,22 +162,22 @@ export default function CustomSignIn() {
         <>
           <input
             type="text"
-            className="border rounded px-3 py-2 text-sm bg-white dark:bg-black text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-400"
+            className="border rounded px-3 py-2 text-sm bg-white dark:bg-black text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-default-light dark:focus:ring-default-dark placeholder:text-default-light dark:placeholder:text-default-dark"
             placeholder="Enter code"
             value={code}
             onChange={e => setCode(e.target.value)}
             disabled={loading}
           />
-          <div className="flex gap-2 mb-2">
+          <div className="flex gap-5 mb-2">
             <button
-              className="text-gray-600 font-semibold py-1 px-3 rounded bg-gray-100 hover:bg-blue-50 text-sm"
+              className="text-default-light dark:text-default-dark text-sm hover:underline bg-transparent border-0"
               onClick={resendEmailCode}
               disabled={loading}
             >
               Resend
             </button>
             <button
-              className="text-white font-semibold py-1 px-3 rounded bg-black hover:bg-gray-600 text-sm"
+              className="text-selected-light dark:text-selected-dark text-sm hover:underline bg-transparent border-0" 
               onClick={submitCode}
               disabled={loading || !code}
             >

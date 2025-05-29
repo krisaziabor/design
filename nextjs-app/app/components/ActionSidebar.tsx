@@ -183,7 +183,7 @@ export default function ActionSidebar({ element, loading, onCommentAdded }: Acti
 
         <div className="w-full">
           <div
-            className="text-sm font-semibold text-gray-700 dark:text-gray-200 mb-2 font-[family-name:var(--font-albragrotesk)]"
+            className="text-sm font-semibold text-selected-light dark:text-selected-dark mb-2 font-[family-name:var(--font-albragrotesk)]"
           >
             Connected projects
           </div>
@@ -196,14 +196,14 @@ export default function ActionSidebar({ element, loading, onCommentAdded }: Acti
                 {element.connectedProjects.map((proj: any, idx: number) => (
                   <li
                     key={proj._id || proj._ref || idx}
-                    className="text-sm text-black dark:text-white font-[family-name:var(--font-albragrotesk)]"
+                    className="text-sm text-selected-light dark:text-selected-dark font-[family-name:var(--font-albragrotesk)]"
                   >
                     {proj.name || proj.title || 'Project'}
                   </li>
                 ))}
               </ul>
             ) : (
-              <div className="text-sm text-gray-400 font-[family-name:var(--font-albragrotesk)]">
+              <div className="text-sm text-default-light dark:text-default-dark font-[family-name:var(--font-albragrotesk)]">
                 This element is not connected to any projects.
               </div>
             )
@@ -212,7 +212,7 @@ export default function ActionSidebar({ element, loading, onCommentAdded }: Acti
           {/* Add a new project */}
           <div className="w-full flex flex-col gap-2 mt-4">
             <span
-              className={`text-sm select-none font-[family-name:var(--font-albragrotesk)] ${isSignedIn ? 'text-blue-600 cursor-pointer hover:underline' : 'text-gray-400 cursor-not-allowed'}`}
+              className={`text-sm select-none font-[family-name:var(--font-albragrotesk)] ${isSignedIn ? 'text-default-light dark:text-default-dark hover:text-selected-light dark:hover:text-selected-dark cursor-pointer' : 'text-default-light dark:text-default-dark cursor-not-allowed'}`}
               onClick={isSignedIn ? () => setShowProjectModal((v) => !v) : undefined}
               tabIndex={isSignedIn ? 0 : -1}
               aria-disabled={!isSignedIn}
@@ -247,7 +247,7 @@ export default function ActionSidebar({ element, loading, onCommentAdded }: Acti
                   </div>
                 )}
                 <button
-                  className={`mt-4 text-sm font-semibold focus:outline-none bg-transparent border-none p-0 text-left font-[family-name:var(--font-albragrotesk)] ${isSignedIn ? 'text-blue-600 cursor-pointer hover:underline' : 'text-gray-400 cursor-not-allowed'}`}
+                  className={`mt-4 text-sm font-semibold focus:outline-none bg-transparent border-none p-0 text-left font-[family-name:var(--font-albragrotesk)] ${isSignedIn ? 'text-selected-light cursor-pointer' : 'text-gray-400 cursor-not-allowed'}`}
                   onClick={isSignedIn ? handleUpdateProjects : undefined}
                   disabled={projectLoading || !isSignedIn}
                   tabIndex={isSignedIn ? 0 : -1}
@@ -265,14 +265,14 @@ export default function ActionSidebar({ element, loading, onCommentAdded }: Acti
         <div className="w-full flex flex-col gap-3 my-auto">
           <div className="flex items-center mb-1">
             <span
-              className="text-sm font-semibold text-gray-700 dark:text-gray-200 font-[family-name:var(--font-albragrotesk)]"
+              className="text-sm font-semibold text-selected-light dark:text-selected-dark font-[family-name:var(--font-albragrotesk)]"
             >
               Latest comment
             </span>
 
             <button
               type="button"
-              className="text-sm font-semibold text-gray-700 cursor-pointer ml-1 focus:outline-none bg-transparent border-none p-0 font-[family-name:var(--font-albragrotesk)]"
+              className="text-sm font-semibold text-default-light dark:text-default-dark hover:text-selected-light dark:hover:text-selected-dark cursor-pointer ml-1 focus:outline-none bg-transparent border-none p-0 font-[family-name:var(--font-albragrotesk)]"
               onClick={() => {
                 const el = document.getElementById('comment-section');
 
@@ -289,13 +289,13 @@ export default function ActionSidebar({ element, loading, onCommentAdded }: Acti
             <div className="mb-2 relative">
               <div className="flex items-center justify-between">
                 <div
-                  className="text-sm text-gray-400 mb-0.5 font-[family-name:var(--font-albragrotesk)]"
+                  className="text-sm text-default-light dark:text-default-dark mb-0.5 font-[family-name:var(--font-albragrotesk)]"
                 >
                   {latestComment.dateAdded ? formatCommentDate(latestComment.dateAdded) : ''}
                 </div>
                 {isSignedIn && (
                   <button
-                    className="ml-2 text-gray-400 hover:text-red-500 focus:outline-none"
+                    className="ml-2 text-default-light dark:text-default-dark hover:text-red-500 focus:outline-none"
                     title="Delete comment"
                     onClick={() => setConfirmDelete(true)}
                     disabled={deleting}
@@ -319,12 +319,12 @@ export default function ActionSidebar({ element, loading, onCommentAdded }: Acti
               {/* Confirmation Modal */}
               {confirmDelete && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-                  <div className="bg-white rounded shadow-lg p-6 max-w-sm w-full text-center">
-                    <div className="mb-4 text-lg font-semibold text-black">Delete this comment?</div>
-                    <div className="mb-6 text-gray-700">Are you sure you want to delete this comment? This action cannot be undone.</div>
+                  <div className="bg-white dark:bg-black rounded shadow-lg p-6 max-w-sm w-full text-center">
+                    <div className="mb-4 text-lg font-semibold text-black dark:text-white">Delete this comment?</div>
+                    <div className="mb-6 text-default-light dark:text-default-dark">Are you sure you want to delete this comment? This action cannot be undone.</div>
                     <div className="flex justify-center gap-4">
                       <button
-                        className="px-4 py-2 rounded bg-gray-200 text-gray-800 hover:bg-gray-300 focus:outline-none"
+                        className="px-4 py-2 rounded bg-gray-200 dark:bg-gray-800 text-gray-800 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-700 focus:outline-none"
                         onClick={() => setConfirmDelete(false)}
                         disabled={deleting}
                       >
@@ -343,7 +343,7 @@ export default function ActionSidebar({ element, loading, onCommentAdded }: Acti
               )}
             </div>
           ) : (
-            <div className="text-sm text-gray-400 font-[family-name:var(--font-albragrotesk)]">No comments yet.</div>
+            <div className="text-sm text-default-light dark:text-default-dark font-[family-name:var(--font-albragrotesk)]">No comments yet.</div>
           )}
 
           {/* Add new comment UI */}
@@ -351,7 +351,7 @@ export default function ActionSidebar({ element, loading, onCommentAdded }: Acti
           {showInput && (
             <div className="mb-2 flex flex-col gap-1">
               <textarea
-                className="w-full border rounded p-1 text-sm text-black dark:text-white bg-white dark:bg-black font-[family-name:var(--font-albragrotesk)]"
+                className="w-full border rounded p-1 text-sm text-black dark:text-white bg-white placeholder:text-default-light dark:placeholder:text-default-dark dark:bg-black font-[family-name:var(--font-albragrotesk)]"
                 rows={2}
                 value={newComment}
                 onChange={(e) => setNewComment(e.target.value)}
@@ -365,7 +365,7 @@ export default function ActionSidebar({ element, loading, onCommentAdded }: Acti
 
           <button
             type="button"
-            className={`text-sm font-semibold focus:outline-none bg-transparent border-none p-0 text-left font-[family-name:var(--font-albragrotesk)] ${isSignedIn ? 'text-blue-600 cursor-pointer hover:underline' : 'text-gray-400 cursor-not-allowed'}`}
+            className={`text-sm font-semibold focus:outline-none bg-transparent border-none p-0 text-left font-[family-name:var(--font-albragrotesk)] ${isSignedIn ? 'text-default-light dark:text-default-dark hover:text-selected-light dark:hover:text-selected-dark cursor-pointer' : 'text-default-light dark:text-default-dark cursor-not-allowed'}`}
             onClick={isSignedIn ? handleAddComment : undefined}
             disabled={submitting || !isSignedIn}
             tabIndex={isSignedIn ? 0 : -1}
@@ -385,7 +385,7 @@ export default function ActionSidebar({ element, loading, onCommentAdded }: Acti
               element.colors.slice(0, 5).map((color: string, idx: number) => (
                 <div key={color + idx} className="relative group flex flex-col items-center">
                   <div
-                    className="w-5 h-5 border border-gray-200 cursor-pointer"
+                    className="w-5 h-5 cursor-pointer"
                     style={{ backgroundColor: color }}
                   ></div>
 
@@ -418,10 +418,11 @@ export default function ActionSidebar({ element, loading, onCommentAdded }: Acti
                 viewBox="0 0 20 20"
                 fill="none"
                 xmlns="http://www.w3.org/2000/svg"
+                className="text-black dark:text-white"
               >
                 <path
                   d="M5 10H15M15 10L11 6M15 10L11 14"
-                  stroke="#222"
+                  stroke="currentColor"
                   strokeWidth="1.5"
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -446,7 +447,7 @@ export default function ActionSidebar({ element, loading, onCommentAdded }: Acti
         {element?.dateAdded && (
           <div className="w-full mt-6 mb-4 flex-shrink-0 flex items-center">
             <span
-              className="text-sm text-gray-500 font-[family-name:var(--font-albragrotesk)]"
+              className="text-sm text-default-light dark:text-default-dark font-[family-name:var(--font-albragrotesk)]"
             >
               {new Date(element.dateAdded).toLocaleString('en-US', {
                 month: 'long',
