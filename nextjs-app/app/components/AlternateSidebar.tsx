@@ -8,8 +8,8 @@ export default function AlternateSidebar() {
   const pathname = usePathname();
   const getClass = (href: string) =>
     `text-sm cursor-pointer transition-colors font-[family-name:var(--font-albragrotesk)] ` +
-    (pathname === href ? 'text-selected-light ' : 'text-default-light ') +
-    'hover:text-selected-light';
+    (pathname === href ? 'text-selected-light dark:text-selected-dark ' : 'text-default-light dark:text-default-dark ') +
+    'hover:text-selected-light dark:hover:text-selected-dark';
 
   return (
     <aside className="w-64 min-h-screen bg-white dark:bg-black flex flex-col pt-8 pb-8 pl-8 pr-4">
@@ -28,7 +28,7 @@ export default function AlternateSidebar() {
         <div className="w-full mt-6 mb-4 flex-shrink-0 flex items-center">
           <Link
             href="/"
-            className="text-sm cursor-pointer transition-colors text-default-light hover:text-selected-light font-[family-name:var(--font-albragrotesk)]"
+            className="text-sm cursor-pointer transition-colors text-default-light dark:text-default-dark hover:text-selected-light dark:hover:text-selected-dark font-[family-name:var(--font-albragrotesk)]"
             tabIndex={0}
             role="button"
           >

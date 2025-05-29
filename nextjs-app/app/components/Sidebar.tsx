@@ -199,29 +199,29 @@ export default function Sidebar({
   const getSidebarItemClass = (isSelected: boolean, isAll: boolean = false) =>
     [
       'text-sm transition-colors cursor-pointer',
-      isSelected ? 'text-selected-light' : 'text-default-light',
-      'hover:text-selected-light'
+      isSelected ? 'text-selected-light dark:text-selected-dark' : 'text-default-light dark:text-default-dark',
+      'hover:text-selected-light dark:hover:text-selected-dark'
     ].join(' ');
 
   const getSidebarSubItemClass = (isSelected: boolean) =>
     [
       'text-xs transition-colors cursor-pointer',
-      isSelected ? 'text-selected-light' : 'text-default-light',
-      'hover:text-selected-light'
+      isSelected ? 'text-selected-light dark:text-selected-dark' : 'text-default-light dark:text-default-dark',
+      'hover:text-selected-light dark:hover:text-selected-dark'
     ].join(' ');
 
   const getSidebarButtonClass = (isSelected: boolean) =>
     [
       'text-sm focus:outline-none transition-colors cursor-pointer',
-      isSelected ? 'text-selected-light' : 'text-default-light',
-      'hover:text-selected-light'
+      isSelected ? 'text-selected-light dark:text-selected-dark' : 'text-default-light dark:text-default-dark',
+      'hover:text-selected-light dark:hover:text-selected-dark'
     ].join(' ');
 
   const getSidebarBottomLinkClass = (isSelected: boolean) =>
     [
       'text-sm cursor-pointer transition-colors',
-      isSelected ? 'text-selected-light' : 'text-default-light',
-      'hover:text-selected-light'
+      isSelected ? 'text-selected-light dark:text-selected-dark' : 'text-default-light dark:text-default-dark',
+      'hover:text-selected-light dark:hover:text-selected-dark'
     ].join(' ');
 
   return (
@@ -236,13 +236,13 @@ export default function Sidebar({
           onClick={handleSelectAll}
         >
           <span
-            className={getSidebarItemClass(false, true) + ' group-hover:text-selected-light'}
+            className={getSidebarItemClass(false, true) + ' group-hover:text-selected-light dark:group-hover:text-selected-dark'}
           >
             All
           </span>
 
           <span
-            className={getSidebarItemClass(false, true) + ' group-hover:text-selected-light'}
+            className={getSidebarItemClass(false, true) + ' group-hover:text-selected-light dark:group-hover:text-selected-dark'}
           >
             {allCount}
           </span>
@@ -288,7 +288,7 @@ export default function Sidebar({
               value={searchValue}
               onChange={e => setSearchValue(e.target.value)}
               placeholder="Search..."
-              className="w-full text-sm text-default-dark font-[family-name:var(--font-albragrotesk)] focus:outline-none bg-transparent border-none p-0 m-0 shadow-none"
+              className="w-full text-sm text-selected-light dark:text-selected-dark placeholder-default-light dark:placeholder-default-dark font-[family-name:var(--font-albragrotesk)] focus:outline-none bg-transparent border-none p-0 m-0 shadow-none"
               aria-label="Search library"
               style={{ boxShadow: 'none', background: 'none', border: 'none' }}
             />
@@ -299,7 +299,7 @@ export default function Sidebar({
               type="button"
               tabIndex={0}
               aria-label="Search help"
-              className="text-gray-400 hover:text-black dark:hover:text-white focus:outline-none"
+              className="text-default-light dark:text-default-dark focus:outline-none"
               style={{ background: 'none', border: 'none', padding: 0, margin: 0, cursor: 'pointer' }}
             >
               <svg width="18" height="18" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -308,7 +308,7 @@ export default function Sidebar({
               </svg>
             </button>
             {/* Tooltip/modal */}
-            <div className="absolute right-auto left-2 top-7 z-50 w-64 bg-white dark:bg-black border border-gray-200 dark:border-gray-700 rounded shadow-lg px-4 py-3 text-xs text-black dark:text-white font-[family-name:var(--font-albragrotesk)] opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 pointer-events-none group-hover:pointer-events-auto group-focus-within:pointer-events-auto transition-opacity duration-150" role="tooltip">
+            <div className="absolute right-auto left-2 top-7 z-50 w-64 bg-white dark:bg-black border-default-light dark:border-default-dark border rounded shadow-lg px-4 py-3 text-xs text-selected-light dark:text-selected-dark font-[family-name:var(--font-albragrotesk)] opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 pointer-events-none group-hover:pointer-events-auto group-focus-within:pointer-events-auto transition-opacity duration-150" role="tooltip">
               Use <span className="font-mono bg-gray-100 dark:bg-gray-800 px-1 rounded">proj:</span> and <span className="font-mono bg-gray-100 dark:bg-gray-800 px-1 rounded">comm:</span> to filter for either connected projects or comments (or both together)
             </div>
           </div>
@@ -331,7 +331,7 @@ export default function Sidebar({
                         className={getSidebarItemClass(
                           (selected.type === 'category' && selected.id === cat._id) ||
                             (selected.type === 'subcategory' && openCategory === cat._id)
-                        ) + ' group-hover:text-selected-light'}
+                        ) + ' group-hover:text-selected-light dark:group-hover:text-selected-dark'}
                       >
                         {cat.name}
                       </span>
@@ -339,7 +339,7 @@ export default function Sidebar({
                         className={getSidebarItemClass(
                           (selected.type === 'category' && selected.id === cat._id) ||
                             (selected.type === 'subcategory' && openCategory === cat._id)
-                        ) + ' group-hover:text-selected-light'}
+                        ) + ' group-hover:text-selected-light dark:group-hover:text-selected-dark'}
                       >
                         {cat.count}
                       </span>
@@ -358,14 +358,14 @@ export default function Sidebar({
                               <span
                                 className={getSidebarSubItemClass(
                                   selected.type === 'subcategory' && selected.id === sub._id
-                                ) + ' group-hover:text-selected-light'}
+                                ) + ' group-hover:text-selected-light dark:group-hover:text-selected-dark'}
                               >
                                 {sub.name}
                               </span>
                               <span
                                 className={getSidebarSubItemClass(
                                   selected.type === 'subcategory' && selected.id === sub._id
-                                ) + ' group-hover:text-selected-light'}
+                                ) + ' group-hover:text-selected-light dark:group-hover:text-selected-dark'}
                               >
                                 {sub.count}
                               </span>
@@ -380,7 +380,7 @@ export default function Sidebar({
             ) : (
               <>
                 <div
-                  className="mb-3 text-xs text-default-light"
+                  className="mb-3 text-xs text-default-light dark:text-default-dark"
                 >
                   Note: Not every element in the library is linked to a project. To view all
                   elements, toggle the Tags view instead.
@@ -397,8 +397,8 @@ export default function Sidebar({
                       <span
                         className={
                           isDisabled
-                            ? 'text-sm transition-colors text-default-light'
-                            : 'text-sm transition-colors text-default-light group-hover:text-selected-light'
+                            ? 'text-sm transition-colors text-default-light dark:text-default-dark'
+                            : 'text-sm transition-colors text-default-light dark:text-default-dark group-hover:text-selected-light dark:group-hover:text-selected-dark'
                         }
                       >
                         {proj.name}
@@ -415,7 +415,7 @@ export default function Sidebar({
 
         <div className="w-full mt-6 mb-4 flex-shrink-0 flex items-center">
           <div className="group w-full">
-            <Link href="/info" className="text-sm cursor-pointer transition-colors text-default-light group-hover:text-selected-light">
+            <Link href="/info" className="text-sm cursor-pointer transition-colors text-default-light dark:text-default-dark group-hover:text-selected-light dark:group-hover:text-selected-dark">
               KAKA
             </Link>
           </div>
