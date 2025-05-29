@@ -4,6 +4,7 @@ import { Drawer } from 'vaul';
 import useSidebarData from './useSidebarData';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
+import handleSidebarSelect from './HandleSidebarSelect';
 
 export default function MobileDrawerMenu({ selected, onSelect }: {
   selected: { type: 'all' | 'category' | 'subcategory' | 'project'; id?: string };
@@ -55,15 +56,12 @@ export default function MobileDrawerMenu({ selected, onSelect }: {
   const isSignin = pathname === '/signin';
   const isSearch = pathname === '/search';
   if (
-    isProject ||
-    isElement ||
-    isInfo ||
-    isColophon ||
-    isSignin ||
-    isSearch ||
-    (!isHome && !isProject && !isElement)
+    isElement && ['category', 'subcategory', 'project'].includes(selected.type)
   ) {
-    peekText = <span>KAKA Design Library</span>;
+    peekText = <>
+      <span>{current.name}</span>
+      <span className="text-xs text-selected-dark dark:text-selected-light">{current.count}</span>
+    </>;
   } else if (
     isHome && ['category', 'subcategory', 'project'].includes(selected.type)
   ) {
@@ -79,6 +77,16 @@ export default function MobileDrawerMenu({ selected, onSelect }: {
   } else {
     peekText = <span>KAKA Design Library</span>;
   }
+
+  // Group subcategories by parentCategory._id
+  const subcategoriesByParent: Record<string, any[]> = {};
+  for (const sub of subcategories) {
+    if (!sub.parentCategory?._id) continue;
+    if (!subcategoriesByParent[sub.parentCategory._id]) subcategoriesByParent[sub.parentCategory._id] = [];
+    subcategoriesByParent[sub.parentCategory._id].push(sub);
+  }
+  // Track which category is open for subcategories
+  const [openCategory, setOpenCategory] = useState<string | null>(null);
 
   return (
     <Drawer.Root open={open} onOpenChange={setOpen} modal={true} direction="bottom">
@@ -110,7 +118,11 @@ export default function MobileDrawerMenu({ selected, onSelect }: {
                 'w-full flex justify-between items-center text-sm font-[family-name:var(--font-albragrotesk)] text-white dark:text-black ' +
                 (selected.type === 'all' ? 'text-selected-light dark:text-selected-dark' : 'text-default-light dark:text-default-dark')
               }
-              onClick={() => setOpen(false)}
+              onClick={e => {
+                e.preventDefault();
+                handleSidebarSelect({ type: 'all' }, router);
+                setOpen(false);
+              }}
             >
               <span>All</span>
               <span>{totalElements}</span>
@@ -137,12 +149,12 @@ export default function MobileDrawerMenu({ selected, onSelect }: {
                 />
               </form>
               {/* Help icon */}
-              <div className="relative ml-2 group flex-shrink-0">
+              <div className="relative ml-2 group flex-shrink-0 flex items-center h-full">
                 <button
                   type="button"
                   tabIndex={0}
                   aria-label="Search help"
-                  className="text-selected-dark dark:text-selected-light focus:outline-none"
+                  className="text-selected-dark dark:text-selected-light focus:outline-none flex items-center h-6"
                   style={{ background: 'none', border: 'none', padding: 0, margin: 0, cursor: 'pointer' }}
                 >
                   <svg width="18" height="18" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -158,33 +170,67 @@ export default function MobileDrawerMenu({ selected, onSelect }: {
             </div>
             {/* Collapsible Tags */}
             <div>
-              <button className="w-full flex justify-between items-center text-sm text-white dark:text-black" onClick={() => setTagsOpen(v => !v)}>
+              <button className="w-full flex items-center justify-between text-sm text-white dark:text-black" onClick={() => setTagsOpen(v => !v)}>
                 <span className="text-sm">Tags</span>
-                <span>{tagsOpen ? '▲' : '▼'}</span>
+                <span className="flex items-center">{tagsOpen ? '▲' : '▼'}</span>
               </button>
               {tagsOpen && (
                 <div className="pl-2 pb-2 flex flex-col gap-1">
                   {sortedCategories.map(cat => {
                     const isDisabled = cat.count === 0;
                     const isSelected = selected.type === 'category' && selected.id === cat._id;
+                    const isOpen = openCategory === cat._id;
                     return (
-                      <button
-                        key={cat._id}
-                        className={
-                          getSidebarItemClass(isSelected) +
-                          ` flex justify-between items-center w-full ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''} text-white dark:text-black text-sm`
-                        }
-                        onClick={() => {
-                          if (!isDisabled) {
-                            onSelect({ type: 'category', id: cat._id });
-                            setOpen(false);
+                      <React.Fragment key={cat._id}>
+                        <button
+                          className={
+                            getSidebarItemClass(isSelected) +
+                            ` flex justify-between items-center w-full ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''} text-white dark:text-black text-sm`
                           }
-                        }}
-                        disabled={isDisabled}
-                      >
-                        <span>{cat.name}</span>
-                        <span className="text-xs text-gray-300 dark:text-gray-700">{cat.count}</span>
-                      </button>
+                          onClick={e => {
+                            e.preventDefault();
+                            if (isDisabled) return;
+                            // Toggle open/close
+                            setOpenCategory(isOpen ? null : cat._id);
+                            // Navigate to category gallery
+                            handleSidebarSelect({ type: 'category', id: cat._id }, router);
+                            setOpen(false);
+                          }}
+                          disabled={isDisabled}
+                        >
+                          <span>{cat.name}</span>
+                          <span className="text-xs text-gray-300 dark:text-gray-700">{cat.count}</span>
+                        </button>
+                        {/* Subcategories, if this category is open */}
+                        {/* DISABLED: subcategories temporarily hidden in the drawer */}
+                        {/* {isOpen && subcategoriesByParent[cat._id] && (
+                          <div className="pl-4 pb-2 flex flex-col gap-1">
+                            {subcategoriesByParent[cat._id].map(sub => {
+                              const isSubDisabled = sub.count === 0;
+                              const isSubSelected = selected.type === 'subcategory' && selected.id === sub._id;
+                              return (
+                                <button
+                                  key={sub._id}
+                                  className={
+                                    getSidebarItemClass(isSubSelected) +
+                                    ` flex justify-between items-center w-full ${isSubDisabled ? 'opacity-50 cursor-not-allowed' : ''} text-white dark:text-black text-xs`
+                                  }
+                                  onClick={e => {
+                                    e.preventDefault();
+                                    if (isSubDisabled) return;
+                                    handleSidebarSelect({ type: 'subcategory', id: sub._id, parentCategoryId: cat._id }, router);
+                                    setOpen(false);
+                                  }}
+                                  disabled={isSubDisabled}
+                                >
+                                  <span>{sub.name}</span>
+                                  <span className="text-xs text-gray-300 dark:text-gray-700">{sub.count}</span>
+                                </button>
+                              );
+                            })}
+                          </div>
+                        )} */}
+                      </React.Fragment>
                     );
                   })}
                 </div>
@@ -192,9 +238,9 @@ export default function MobileDrawerMenu({ selected, onSelect }: {
             </div>
             {/* Collapsible Projects */}
             <div>
-              <button className="w-full flex justify-between items-center text-sm text-white dark:text-black" onClick={() => setProjectsOpen(v => !v)}>
+              <button className="w-full flex items-center justify-between text-sm text-white dark:text-black" onClick={() => setProjectsOpen(v => !v)}>
                 <span className="text-sm">Projects</span>
-                <span>{projectsOpen ? '▲' : '▼'}</span>
+                <span className="flex items-center">{projectsOpen ? '▲' : '▼'}</span>
               </button>
               {projectsOpen && (
                 <div className="pl-2 pb-2 flex flex-col gap-1">
