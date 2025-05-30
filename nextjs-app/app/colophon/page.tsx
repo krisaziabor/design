@@ -17,6 +17,10 @@ function useIsMobile() {
 
 export default function ColophonPage() {
   const isMobile = useIsMobile();
+  const [hasMounted, setHasMounted] = React.useState(false);
+  React.useEffect(() => {
+    setHasMounted(true);
+  }, []);
   return (
     <>
       <div className="min-h-screen flex flex-row bg-white dark:bg-black">
@@ -29,7 +33,9 @@ export default function ColophonPage() {
           <ColophonContent />
         </main>
       </div>
-      <MobileDrawerMenu selected={{ type: 'all' }} onSelect={() => {}} />
+      {hasMounted && isMobile && (
+        <MobileDrawerMenu selected={{ type: 'all' }} onSelect={() => {}} />
+      )}
     </>
   );
 } 

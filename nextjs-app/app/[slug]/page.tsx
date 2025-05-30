@@ -29,20 +29,15 @@ export async function generateStaticParams() {
  * Generate metadata for the page.
  * Learn more: https://nextjs.org/docs/app/api-reference/functions/generate-metadata#generatemetadata-function
  */
-export async function generateMetadata(props: Props): Promise<Metadata> {
-  const params = await props.params;
-  const { data: page } = await sanityFetch({
-    query: getPageQuery,
-    params,
-    // Metadata should never contain stega
-    stega: false,
-  });
-
-  return {
-    title: page?.name,
-    description: page?.heading,
-  } satisfies Metadata;
-}
+export const metadata: Metadata = {
+  title: "KAKA Design Library",
+  openGraph: {
+    images: ["/cover.jpg"],
+  },
+  icons: {
+    icon: "/icon.ico",
+  },
+};
 
 export default async function Page(props: Props) {
   const params = await props.params;

@@ -19,6 +19,11 @@ function useIsMobile() {
 export default function InfoPage() {
   const [lastUpdated, setLastUpdated] = useState<string | undefined>(undefined);
   const isMobile = useIsMobile();
+  const [hasMounted, setHasMounted] = useState(false);
+
+  useEffect(() => {
+    setHasMounted(true);
+  }, []);
 
   useEffect(() => {
     async function fetchLastAdded() {
@@ -43,7 +48,9 @@ export default function InfoPage() {
         </main>
       </div>
       {/* Always render the mobile drawer menu for navigation on all screens */}
-      <MobileDrawerMenu selected={{ type: 'all' }} onSelect={() => {}} />
+      {hasMounted && isMobile && (
+        <MobileDrawerMenu selected={{ type: 'all' }} onSelect={() => {}} />
+      )}
     </>
   );
 } 

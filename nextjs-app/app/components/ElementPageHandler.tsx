@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
 
 import Sidebar from '@/app/components/Sidebar';
@@ -62,6 +62,12 @@ export default function ElementPageHandler() {
 
   const [similarLoading, setSimilarLoading] = useState(false);
 
+  // Add hasMounted state to prevent SSR hydration mismatch
+  const [hasMounted, setHasMounted] = useState(false);
+  useEffect(() => {
+    setHasMounted(true);
+  }, []);
+
   // Determine selected filter from URL
 
   let selectedFilter: { type: 'all' | 'category' | 'subcategory' | 'project'; id?: string } = { type: 'all' };
@@ -81,7 +87,7 @@ export default function ElementPageHandler() {
   const [filteredElements, setFilteredElements] = useState<any[]>([]);
   const [filteredLoading, setFilteredLoading] = useState(true);
 
-  const fetchElement = async () => {
+  const fetchElement = useCallback(async () => {
     setLoading(true);
     const data = await clientNoCdn.fetch(
       '*[_type == "elements" && _id == $id]{_id, eagleId, fileType, fileName, file{..., asset, "assetOriginalFilename": asset->originalFilename}, url, mainCategory, subCategories, thumbnail, dateAdded, colors, comments[]{_key, _type, text, dateAdded, dateEdited, parentElement}, connectedProjects[]->}[0]',
@@ -89,11 +95,11 @@ export default function ElementPageHandler() {
     );
     setElement(data);
     setLoading(false);
-  };
+  }, [id]);
 
   useEffect(() => {
     if (id) fetchElement();
-  }, [id]);
+  }, [id, fetchElement]);
 
   // Fetch similar elements by domain
 
@@ -183,7 +189,7 @@ export default function ElementPageHandler() {
       {/* Main Content */}
       <main className="flex-1 flex flex-col items-center px-4 py-8 overflow-y-auto max-h-screen text-black dark:text-white">
         {/* --- MOBILE LAYOUT --- */}
-        {isMobile && (
+        {hasMounted && isMobile && (
           <MobileDrawerMenu selected={selectedFilter} onSelect={onSidebarSelect} />
         )}
         {isMobile ? (
