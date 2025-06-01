@@ -1,5 +1,5 @@
-import { rgbToHex } from '../../helpers/color';
-import { elementExists } from './elementExists';
+import { rgbToHex } from '../../helpers/color.js';
+import { elementExists } from './elementExists.js';
 
 export async function createElement(el: any, mainCategoryRef: string, sanity: any, ensureSubCategoriesExist: (tags: string[], sanity: any, parentCategoryId: string) => Promise<any[]>) {
   // Check if the element already exists in Sanity by eagleId

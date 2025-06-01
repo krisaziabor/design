@@ -9,47 +9,28 @@ import { clientPublic } from '@/sanity/lib/client-public';
 // GROQ queries
 
 const categoriesWithCountQuery = `
-
 *[_type == "category"]{
-
-_id,
-
-name,
-
-"count": count(*[_type == 'elements' && references(^._id)])
-
+  _id,
+  name,
+  "count": count(*[_type == 'elements' && fileUploaded == true && references(^._id)])
 }
-
 `;
 
 const subcategoriesWithCountQuery = `
-
 *[_type == "subcategory"]{
-
-_id,
-
-name,
-
-parentCategory->{_id},
-
-"count": count(*[_type == 'elements' && references(^._id)])
-
+  _id,
+  name,
+  parentCategory->{_id},
+  "count": count(*[_type == 'elements' && fileUploaded == true && references(^._id)])
 }
-
 `;
 
 const projectsWithCountQuery = `
-
 *[_type == "project"]{
-
-_id,
-
-name,
-
-"count": count(*[_type == 'elements' && references(^._id)])
-
+  _id,
+  name,
+  "count": count(*[_type == 'elements' && fileUploaded == true && references(^._id)])
 }
-
 `;
 
 export default function Sidebar({
@@ -123,7 +104,7 @@ export default function Sidebar({
         clientPublic.fetch(categoriesWithCountQuery),
         clientPublic.fetch(subcategoriesWithCountQuery),
         clientPublic.fetch(projectsWithCountQuery),
-        clientPublic.fetch("count(*[_type == 'elements'])"),
+        clientPublic.fetch("count(*[_type == 'elements' && fileUploaded == true])"),
       ]);
       setCategories(cats || []);
       setSubcategories(subs || []);
@@ -319,7 +300,7 @@ export default function Sidebar({
         {!loading && (
           <div className="w-full flex flex-col gap-1 my-auto overflow-y-auto">
             {view === 'tags' ? (
-              sortedCategories.map((cat) => {
+              sortedCategories.filter(cat => cat.count > 0).map((cat) => {
                 const isDisabled = cat.count === 0;
                 return (
                   <React.Fragment key={cat._id}>
@@ -347,7 +328,7 @@ export default function Sidebar({
                     {/* Subcategories, if this category is open */}
                     {openCategory === cat._id && subcategoriesByParent[cat._id] && (
                       <div className="ml-4 flex flex-col gap-1">
-                        {subcategoriesByParent[cat._id].map((sub) => {
+                        {subcategoriesByParent[cat._id].filter(sub => sub.count > 0).map((sub) => {
                           const isSubDisabled = sub.count === 0;
                           return (
                             <div
@@ -386,7 +367,7 @@ export default function Sidebar({
                   elements, toggle the Tags view instead.
                 </div>
 
-                {sortedProjects.map((proj) => {
+                {sortedProjects.filter(proj => proj.count > 0).map((proj) => {
                   const isDisabled = proj.count === 0;
                   return (
                     <div

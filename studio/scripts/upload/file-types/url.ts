@@ -52,8 +52,16 @@ export async function handleUrlFileType(eagleId: string, sanity: any, accessKey?
     const response = await axios.get(fullPageScreenshotUrl, { responseType: 'arraybuffer' });
     fileBuffer = Buffer.from(response.data);
   } catch (err) {
-    console.error(`Failed to fetch full-page screenshot for URL: ${result.url}`, err);
-    return null;
+    console.error(`Failed to fetch full-page screenshot, trying alternate URL for: ${result.url}`);
+    // Try alternate URL with different parameters
+    const alternateScreenshotUrl = `https://api.screenshotone.com/take?image_quality=100&viewport_height=1920&url=${encodeURIComponent(result.url)}&access_key=${key}`;
+    try {
+      const altResponse = await axios.get(alternateScreenshotUrl, { responseType: 'arraybuffer' });
+      fileBuffer = Buffer.from(altResponse.data);
+    } catch (altErr) {
+      console.error(`Failed to fetch screenshot with alternate URL: ${result.url}`, altErr);
+      return null;
+    }
   }
   let uploadedFileAsset;
   try {

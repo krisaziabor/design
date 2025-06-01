@@ -82,16 +82,14 @@ function PageContent() {
       setLoading(true);
 
       const data = await clientNoCdn.fetch(
-        '*[_type == "elements"]{_id, eagleId, fileType, fileName, file, url, mainCategory, subCategories, thumbnail, dateAdded, connectedProjects[]->}'
+        '*[_type == "elements" && fileUploaded == true]{_id, eagleId, fileType, fileName, file, url, mainCategory, subCategories, thumbnail, dateAdded, connectedProjects[]->}'
       );
 
       // Sort by most recent dateAdded to earliest
 
       const sorted = (data || []).sort((a: any, b: any) => {
         const dateA = new Date(a.dateAdded).getTime();
-
         const dateB = new Date(b.dateAdded).getTime();
-
         return dateB - dateA;
       });
 

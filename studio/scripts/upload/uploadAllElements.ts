@@ -1,12 +1,16 @@
 import dotenv from 'dotenv';
 import path from 'path';
 import { createClient } from '@sanity/client';
-import { handleJPGFileType } from './file-types/jpgs';
-import { handleNonJPGSFileType } from './file-types/nonJPGS';
-import { handleOtherFileType } from './file-types/other';
-import { handleUrlFileType } from './file-types/url';
-import { updateElementToYoutube } from './file-types/youtube';
-import { shouldSkipElementWithFile } from './helpers/shouldSkipElementWithFile';
+import { handleJPGFileType } from './file-types/jpgs.js';
+import { handleNonJPGSFileType } from './file-types/nonJPGS.js';
+import { handleOtherFileType } from './file-types/other.js';
+import { handleUrlFileType } from './file-types/url.js';
+import { updateElementToYoutube } from './file-types/youtube.js';
+import { shouldSkipElementWithFile } from './helpers/shouldSkipElementWithFile.js';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 dotenv.config({ path: path.resolve(__dirname, '../../.env') });
 
@@ -23,25 +27,31 @@ const sanity = createClient({
 });
 
 async function main() {
-  // Fetch all elements
+  const isDryRun = process.argv.includes('--dry-run');
+  // Fetch only elements where fileUploaded is not true
   const elements = await sanity.fetch(
-    '*[_type == "elements"]{eagleId, fileType, fileName, file}'
+    '*[_type == "elements" && fileUploaded != true]{eagleId, fileType, fileName, file}'
   );
   if (!elements || elements.length === 0) {
-    console.log('No elements found.');
+    console.log('No elements found that need uploading.');
     return;
   }
-  console.log(`Found ${elements.length} elements.`);
+  console.log(`Found ${elements.length} elements that need uploading.`);
+
+  if (isDryRun) {
+    console.log('\n--- DRY RUN: The following elements would be uploaded ---');
+    elements.forEach((el: any, i: number) => {
+      console.log(`${i + 1}. eagleId: ${el.eagleId}, fileType: ${el.fileType}, fileName: ${el.fileName}`);
+    });
+    console.log('--- END DRY RUN ---\n');
+    return;
+  }
 
   for (let i = 0; i < elements.length; i++) {
     const el = elements[i];
     process.stdout.write(`\r${i + 1}/${elements.length}\nCurrent Element: ${el.fileName || el.eagleId}   `);
     if (!el.eagleId || !el.fileType) {
       console.warn(`Skipping element with missing eagleId or fileType:`, el);
-      continue;
-    }
-    if (shouldSkipElementWithFile(el)) {
-      console.log(`Skipping element ${el.eagleId} because file is already uploaded.`);
       continue;
     }
     let patched = null;
