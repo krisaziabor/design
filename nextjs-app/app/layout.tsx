@@ -31,18 +31,18 @@ const albragroteskmedium = localFont({
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://library.krisaziabor.com'),
-  title: "KAKA Design Library",
+  title: "Constellating Library",
   description:
     "A collection of design inspirations for my practice.",
   icons: "icon.ico",
 
   // This is where you can add your Open Graph details:
   openGraph: {
-    title: "KAKA Design Library",
+    title: "Constellating Library",
     description:
       "A collection of design inspirations for my practice.",
     url: "https://library.krisaziabor.com",
-    siteName: "KAKA Design Library",
+    siteName: "Constellating Library",
     images: [
       {
         url: "/cover.jpg",
@@ -57,7 +57,7 @@ export const metadata: Metadata = {
   // And here are Twitter-specific tags (many platforms also read them):
   twitter: {
     card: "summary_large_image",
-    title: "KAKA Design Library",
+    title: "Constellating Library",
     description:
       "A collection of design inspirations for my practice.",
     images: ["/cover.jpg"],

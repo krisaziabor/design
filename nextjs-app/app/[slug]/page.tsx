@@ -30,7 +30,7 @@ export async function generateStaticParams() {
  * Learn more: https://nextjs.org/docs/app/api-reference/functions/generate-metadata#generatemetadata-function
  */
 export const metadata: Metadata = {
-  title: "KAKA Design Library",
+  title: "Constellating Library",
   openGraph: {
     images: ["/cover.jpg"],
   },

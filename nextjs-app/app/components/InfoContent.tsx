@@ -9,7 +9,7 @@ export default function InfoContent({ lastUpdated }: { lastUpdated?: string }) {
         </p>
       )}
       <p>
-        KAKA Design Library is the first of several archival web projects I intend on creating this
+        Constellating Library is the first of several archival web projects I intend on creating this
         summer for my personal practices.
       </p>
 

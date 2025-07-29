@@ -442,7 +442,7 @@ export default function ActionSidebar({ element, loading, onCommentAdded }: Acti
           )}
         </div>
 
-        {/* Bottom: Timestamp aligned like 'KAKA Design Library' */}
+        {/* Bottom: Timestamp aligned like 'Constellating Library' */}
 
         {element?.dateAdded && (
           <div className="w-full mt-6 mb-4 flex-shrink-0 flex items-center">

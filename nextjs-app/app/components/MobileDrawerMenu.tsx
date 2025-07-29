@@ -75,7 +75,7 @@ export default function MobileDrawerMenu({ selected, onSelect }: {
       <span className="text-xs text-selected-dark dark:text-selected-light">{totalElements}</span>
     </>;
   } else {
-    peekText = <span>KAKA Design Library</span>;
+    peekText = <span>Constellating Library</span>;
   }
 
   // Group subcategories by parentCategory._id

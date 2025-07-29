@@ -397,7 +397,7 @@ export default function Sidebar({
         <div className="w-full mt-6 mb-4 flex-shrink-0 flex items-center">
           <div className="group w-full">
             <Link href="/info" className="text-sm cursor-pointer transition-colors text-default-light dark:text-default-dark group-hover:text-selected-light dark:group-hover:text-selected-dark">
-              KAKA
+              Constellating
             </Link>
           </div>
         </div>

@@ -46,7 +46,7 @@ function resolveHref(documentType?: string, slug?: string): string | undefined {
 // Main Sanity configuration
 export default defineConfig({
   name: 'default',
-  title: 'KAKA Design Library',
+  title: 'Constellating Library',
 
   projectId,
   dataset,
