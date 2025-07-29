@@ -8,6 +8,7 @@ import { draftMode } from "next/headers";
 import { VisualEditing, toPlainText } from "next-sanity";
 import { Toaster } from "sonner";
 import { ClerkProvider } from '@clerk/nextjs';
+import { VideoProcessingProvider } from '@/app/components/VideoProcessingProvider';
 
 import DraftModeToast from "@/app/components/DraftModeToast";
 import * as demo from "@/sanity/lib/demo";
@@ -87,7 +88,9 @@ export default async function RootLayout({
           )}
           {/* The <SanityLive> component is responsible for making all sanityFetch calls in your application live, so should always be rendered. */}
           <SanityLive onError={handleError} />
-          <main className="">{children}</main>
+          <VideoProcessingProvider>
+            <main className="">{children}</main>
+          </VideoProcessingProvider>
           <SpeedInsights />
         </body>
       </ClerkProvider>

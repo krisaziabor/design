@@ -16,6 +16,8 @@ export default {
         black: "#0d0e12",
         white: "#fff",
         'default-light': '#808080', // light grey
+        'off-white': '#F6F6F6', // off white
+        'off-white-dark': '#E6E6E6', // off white dark
         'selected-light': '#000000', // black
         'default-dark': '#808080',   // light grey
         'selected-dark': '#ffffff',  // white

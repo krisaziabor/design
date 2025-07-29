@@ -74,6 +74,12 @@ export default {
       validation: Rule => Rule.required()
     },
     {
+      name: 'caption',
+      title: 'Caption',
+      type: 'string',
+      description: 'Caption of the element'
+    },
+    {
       name: 'tags',
       title: 'Tags',
       type: 'array',

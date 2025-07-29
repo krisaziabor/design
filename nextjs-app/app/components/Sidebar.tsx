@@ -186,7 +186,7 @@ export default function Sidebar({
 
   const getSidebarSubItemClass = (isSelected: boolean) =>
     [
-      'text-xs transition-colors cursor-pointer',
+      'text-sm transition-colors cursor-pointer',
       isSelected ? 'text-selected-light dark:text-selected-dark' : 'text-default-light dark:text-default-dark',
       'hover:text-selected-light dark:hover:text-selected-dark'
     ].join(' ');
@@ -206,7 +206,7 @@ export default function Sidebar({
     ].join(' ');
 
   return (
-    <aside className="w-64 min-h-screen bg-white dark:bg-black flex flex-col pt-8 pb-8 pl-8 pr-4">
+    <aside className="w-64 min-h-screen bg-white dark:bg-black flex flex-col pt-8 pb-8 pl-8 pr-8">
       <div className="flex flex-col w-full h-full flex-1 justify-between">
         {/* Top controls section container */}
 

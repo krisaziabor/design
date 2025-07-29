@@ -37,6 +37,7 @@ function PageContent() {
   const [elements, setElements] = useState<any[]>([]);
 
   const [loading, setLoading] = useState(true);
+  const [hasInitiallyLoaded, setHasInitiallyLoaded] = useState(false);
 
   const [selectedFilter, setSelectedFilter] = useState<{
     type: 'all' | 'category' | 'subcategory' | 'project';
@@ -96,10 +97,15 @@ function PageContent() {
       setElements(sorted);
 
       setLoading(false);
+      
+      // Mark as initially loaded only if we're showing the main collection (type 'all')
+      if (selectedFilter.type === 'all') {
+        setHasInitiallyLoaded(true);
+      }
     }
 
     fetchElements();
-  }, []);
+  }, [selectedFilter.type]);
 
   // Filtering logic
 
@@ -122,6 +128,8 @@ function PageContent() {
   }
 
   const isMobile = useIsMobile();
+
+  const shouldAnimateThumbnails = selectedFilter.type === 'all' && hasInitiallyLoaded && !loading;
 
   return (
     <>
@@ -147,8 +155,14 @@ function PageContent() {
               </div>
             ) : (
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 items-stretch">
-                {filteredElements.map((el: any) => (
-                  <ElementThumbnail key={el._id} element={el} selectedFilter={selectedFilter} />
+                {filteredElements.map((el: any, index: number) => (
+                  <ElementThumbnail 
+                    key={el._id} 
+                    element={el} 
+                    selectedFilter={selectedFilter}
+                    shouldAnimate={shouldAnimateThumbnails}
+                    animationIndex={index}
+                  />
                 ))}
               </div>
             )
